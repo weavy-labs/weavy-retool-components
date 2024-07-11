@@ -2,15 +2,65 @@ import React from 'react'
 import { type FC } from 'react'
 
 import { Retool } from '@tryretool/custom-component-support'
+import { useWeavy, WyChat, WyNotifications } from '@weavy/uikit-react'
 
-export const HelloWorld: FC = () => {
-  const [name, _setName] = Retool.useStateString({
-    name: 'name'
+import "./styles.css";
+
+export const WeavyChat: FC = () => {
+  const [uid, _setUid] = Retool.useStateString({
+    name: 'uid',
+    description: "The uid of the chat block."
+  })
+
+  const [accessToken, _setAccessToken] = Retool.useStateString({
+    name: 'accessToken',
+    description: "The access token for the user"
+  })
+
+  const [weavyUrl, _setWeavyUrl] = Retool.useStateString({
+    name: 'weavyUrl',
+    initialValue: "",
+    description: "The url to the weavy environment"
+  })
+
+  const weavy = useWeavy({
+    url: weavyUrl,
+    tokenFactory: async () => accessToken
   })
 
   return (
-    <div>
-      <div>Hello {name}!</div>
-    </div>
+    <WyChat uid={uid} />
   )
 }
+
+export const WeavyNotifications: FC = () => {
+  const [uid, _setUid] = Retool.useStateString({
+    name: 'uid',
+    description: "Optional uid to display notifications for."
+  })
+
+  const [accessToken, _setAccessToken] = Retool.useStateString({
+    name: 'accessToken',
+    description: "The access token for the user"
+  })
+
+  const [weavyUrl, _setWeavyUrl] = Retool.useStateString({
+    name: 'weavyUrl',
+    initialValue: "",
+    description: "The url to the weavy environment"
+  })
+
+  const onLink = Retool.useEventCallback({ 
+    name: "link" 
+  });
+
+  const weavy = useWeavy({
+    url: weavyUrl,
+    tokenFactory: async () => accessToken
+  })
+
+  return (
+    <WyNotifications uid={uid} onWyLink={onLink} />
+  )
+}
+

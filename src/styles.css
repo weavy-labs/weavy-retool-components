@@ -1,0 +1,16 @@
+:root {
+  --wy-theme-color: #46a77c;
+  --wy-border-radius: 8px;
+  font-family: 'Inter var', sans-serif;
+}
+
+html,
+body {
+  padding: 0px;
+  margin: 0px;
+  height: 100%;
+}
+
+wy-chat, wy-notifications {
+  height: 100%;
+}
