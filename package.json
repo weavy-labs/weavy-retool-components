@@ -7,8 +7,8 @@
     "deploy": "retool-ccl deploy"
   },
   "dependencies": {
-    "@tryretool/custom-component-support": "latest",
-    "@weavy/uikit-react": "^24.0.0",
+    "@tryretool/custom-component-support": "^0.0.18",
+    "@weavy/uikit-react": "^24.4.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
@@ -28,13 +28,13 @@
     ]
   },
   "devDependencies": {
-    "@types/react": "^18.2.55",
-    "@typescript-eslint/eslint-plugin": "^7.3.1",
-    "@typescript-eslint/parser": "^7.3.1",
-    "eslint": "^8.57.0",
-    "eslint-plugin-react": "^7.34.1",
+    "@types/react": "^18.3.8",
+    "@typescript-eslint/eslint-plugin": "^8.6.0",
+    "@typescript-eslint/parser": "^8.6.0",
+    "eslint": "^9.11.0",
+    "eslint-plugin-react": "^7.36.1",
     "postcss-modules": "^6.0.0",
-    "prettier": "^3.0.3"
+    "prettier": "^3.3.3"
   },
   "retoolCustomComponentLibraryConfig": {
     "name": "WeavyBlocks",
