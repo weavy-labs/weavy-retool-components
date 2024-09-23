@@ -14,13 +14,16 @@ export const WeavyChat: FC = () => {
 
   const [accessToken, _setAccessToken] = Retool.useStateString({
     name: 'accessToken',
-    description: "The access token for the user"
+    label: 'User access token *',
+    initialValue: '{{ getWeavyToken.data?.access_token }}',
+    description: 'The access token for the user'
   })
 
   const [weavyUrl, _setWeavyUrl] = Retool.useStateString({
     name: 'weavyUrl',
-    initialValue: "",
-    description: "The url to the weavy environment"
+    label: 'Weavy environment URL *',
+    initialValue: '{{ getWeavyConfig.data?.url }}',
+    description: 'The url to the weavy environment'
   })
 
   const weavy = useWeavy({

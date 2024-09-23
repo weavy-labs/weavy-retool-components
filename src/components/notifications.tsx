@@ -15,15 +15,15 @@ import '../styles.css'
 export const WeavyNotificationEvents: FC = () => {
   const [accessToken, _setAccessToken] = Retool.useStateString({
     name: 'accessToken',
-    label: "User access token *",
-    initialValue: "{{ weavy_token.data.access_token }}",
+    label: 'User access token *',
+    initialValue: '{{ getWeavyToken.data?.access_token }}',
     description: 'The access token for the user'
   })
 
   const [weavyUrl, _setWeavyUrl] = Retool.useStateString({
     name: 'weavyUrl',
-    label: "Weavy environment URL *",
-    initialValue: "{{ weavy_url.value }}",
+    label: 'Weavy environment URL *',
+    initialValue: '{{ getWeavyConfig.data?.url }}',
     description: 'The url to the weavy environment'
   })
 
@@ -34,11 +34,18 @@ export const WeavyNotificationEvents: FC = () => {
     description: 'The number of unread notifications.'
   })
 
-  const [_notificationData, setNotificationData] = Retool.useStateString({
-    name: 'notificationData',
+  const [_notificationTitle, setNotificationTitle] = Retool.useStateString({
+    name: 'notificationTitle',
     inspector: 'hidden',
-    description: 'The data from the most recent notification event.'
+    description: 'The title of the most recent notification event.'
   })
+
+  const [_notificationDescription, setNotificationDescription] =
+    Retool.useStateString({
+      name: 'notificationDescription',
+      inspector: 'hidden',
+      description: 'The description of the most recent notification event.'
+    })
 
   const triggerNotification = Retool.useEventCallback({ name: 'notification' })
 
@@ -76,8 +83,11 @@ export const WeavyNotificationEvents: FC = () => {
       // Only show notifications when a new notification is received
 
       // Show notifications using the Retool
-      setNotificationData(e.detail.notification.plain)
-      triggerNotification();
+      const [title, description] = e.detail.notification.plain.split(':', 2)
+      setNotificationTitle(title)
+      setNotificationDescription(description)
+
+      triggerNotification()
     }
 
     // Always update the notification count when notifications updates are received
@@ -108,21 +118,21 @@ export const WeavyNotificationEvents: FC = () => {
 export const WeavyNotifications: FC = () => {
   const [uid, _setUid] = Retool.useStateString({
     name: 'uid',
-    label: "UID (optional)",
+    label: 'UID (optional)',
     description: 'Optional uid to display notifications for.'
   })
 
   const [accessToken, _setAccessToken] = Retool.useStateString({
     name: 'accessToken',
-    label: "User access token *",
-    initialValue: "{{ weavy_token.data.access_token }}",
+    label: 'User access token *',
+    initialValue: '{{ getWeavyToken.data?.access_token }}',
     description: 'The access token for the user'
   })
 
   const [weavyUrl, _setWeavyUrl] = Retool.useStateString({
     name: 'weavyUrl',
-    label: "Weavy environment URL *",
-    initialValue: "{{ weavy_url.value }}",
+    label: 'Weavy environment URL *',
+    initialValue: '{{ getWeavyConfig.data?.url }}',
     description: 'The url to the weavy environment'
   })
 
@@ -137,7 +147,7 @@ export const WeavyNotifications: FC = () => {
 
   const weavy = useWeavy({
     url: weavyUrl,
-    tokenFactory: async () => accessToken,
+    tokenFactory: async () => accessToken
   })
 
   const handleLink = (e: WyLinkEventType) => {
@@ -150,14 +160,13 @@ export const WeavyNotifications: FC = () => {
     if (ConversationTypes.has(appType as string)) {
       // Show the messenger
       triggerMessenger()
-
     } else if (appUid) {
       // Show a contextual block by navigation to another page
 
       // The uid should look something like "refine:adb567a"
       // We have embedded base-64 encoded path information in the uid and to use it we need to decode it.
-      if (appUid.startsWith("retool:")) {
-        triggerLink();
+      if (appUid.startsWith('retool:')) {
+        triggerLink()
       }
     }
   }
