@@ -1,14 +1,12 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { type FC } from 'react'
-import { useWeavy, WyChat } from '@weavy/uikit-react'
+import { useWeavy, WyMessenger } from '@weavy/uikit-react'
 import { useAccessToken, useWeavyUrl } from '../properties/weavy'
 
 import '../styles.css'
-import { useUid } from '../properties/uid'
 import { useThemeStyles } from '../properties/theme'
 
-export const WeavyChat: FC = () => {
-  const { uid } = useUid()
+export const WeavyMessenger: FC = () => {
   const { accessToken } = useAccessToken()
   const { weavyUrl } = useWeavyUrl()
   const { themeStyles } = useThemeStyles()
@@ -18,5 +16,5 @@ export const WeavyChat: FC = () => {
     tokenFactory: async () => accessToken
   })
 
-  return <WyChat uid={uid} style={themeStyles} />
+  return <WyMessenger style={themeStyles} />
 }

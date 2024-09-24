@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react'
 import { type FC } from 'react'
-
 import { Retool } from '@tryretool/custom-component-support'
 import {
   ConversationTypes,
@@ -9,43 +8,28 @@ import {
   WyNotifications,
   WyNotificationsEventType
 } from '@weavy/uikit-react'
+import { useAccessToken, useWeavyUrl } from '../properties/weavy'
 
 import '../styles.css'
+import { useOptionalUid } from '../properties/uid'
+import {
+  useNotificationCount,
+  useNotificationDescription,
+  useNotificationTitle
+} from '../properties/notifications'
+import { useThemeStyles } from '../properties/theme'
 
 export const WeavyNotificationEvents: FC = () => {
-  const [accessToken, _setAccessToken] = Retool.useStateString({
-    name: 'accessToken',
-    label: 'User access token *',
-    initialValue: '{{ getWeavyToken.data?.access_token }}',
-    description: 'The access token for the user'
-  })
+  const { accessToken } = useAccessToken()
+  const { weavyUrl } = useWeavyUrl()
+  const { setNotificationCount } = useNotificationCount()
+  const { setNotificationTitle } = useNotificationTitle()
+  const { setNotificationDescription } = useNotificationDescription()
 
-  const [weavyUrl, _setWeavyUrl] = Retool.useStateString({
-    name: 'weavyUrl',
-    label: 'Weavy environment URL *',
-    initialValue: '{{ getWeavyConfig.data?.url }}',
-    description: 'The url to the weavy environment'
+  Retool.useComponentSettings({
+    defaultHeight: 1,
+    defaultWidth: 1
   })
-
-  const [_notificationCount, setNotificationCount] = Retool.useStateNumber({
-    name: 'notificationCount',
-    initialValue: 0,
-    inspector: 'hidden',
-    description: 'The number of unread notifications.'
-  })
-
-  const [_notificationTitle, setNotificationTitle] = Retool.useStateString({
-    name: 'notificationTitle',
-    inspector: 'hidden',
-    description: 'The title of the most recent notification event.'
-  })
-
-  const [_notificationDescription, setNotificationDescription] =
-    Retool.useStateString({
-      name: 'notificationDescription',
-      inspector: 'hidden',
-      description: 'The description of the most recent notification event.'
-    })
 
   const triggerNotification = Retool.useEventCallback({ name: 'notification' })
 
@@ -116,25 +100,10 @@ export const WeavyNotificationEvents: FC = () => {
 }
 
 export const WeavyNotifications: FC = () => {
-  const [uid, _setUid] = Retool.useStateString({
-    name: 'uid',
-    label: 'UID (optional)',
-    description: 'Optional uid to display notifications for.'
-  })
-
-  const [accessToken, _setAccessToken] = Retool.useStateString({
-    name: 'accessToken',
-    label: 'User access token *',
-    initialValue: '{{ getWeavyToken.data?.access_token }}',
-    description: 'The access token for the user'
-  })
-
-  const [weavyUrl, _setWeavyUrl] = Retool.useStateString({
-    name: 'weavyUrl',
-    label: 'Weavy environment URL *',
-    initialValue: '{{ getWeavyConfig.data?.url }}',
-    description: 'The url to the weavy environment'
-  })
+  const { uid } = useOptionalUid()
+  const { accessToken } = useAccessToken()
+  const { weavyUrl } = useWeavyUrl()
+  const { themeStyles }  = useThemeStyles()
 
   const [_linkData, setLinkData] = Retool.useStateObject({
     name: 'linkData',
@@ -171,5 +140,5 @@ export const WeavyNotifications: FC = () => {
     }
   }
 
-  return <WyNotifications uid={uid} onWyLink={handleLink} />
+  return <WyNotifications uid={uid} onWyLink={handleLink} style={themeStyles} />
 }
