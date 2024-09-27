@@ -100,3 +100,5 @@ To set up navigation when clicking notification items in the Notifications compo
     utils.openApp(retoolContext.appUuid, weavyNotifications1.navigationParams)
     ```
 * Optionally any additional *Event handler* for the `Navigation` event to do additional things upon navigation, such as closing a *Drawer* for instance.
+* Add an *Event handler for the `Open messenger` event.
+ - Set the event to do whatever you need to show the messenger, such as opening a drawer.
