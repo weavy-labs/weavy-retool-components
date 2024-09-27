@@ -1,4 +1,7 @@
 import { Retool } from '@tryretool/custom-component-support'
+import { useMemo } from 'react'
+
+export type WeavyTokenFactory = (refresh: boolean) => Promise<string>
 
 export const useAccessToken = () => {
   const [accessToken] = Retool.useStateString({
@@ -18,4 +21,21 @@ export const useWeavyUrl = () => {
     description: 'The url to the weavy environment'
   })
   return { weavyUrl }
+}
+
+export const useTokenFactory = () => {
+  const { accessToken } = useAccessToken()
+  const triggerRefresh = Retool.useEventCallback({ name: 'refresh-token' })
+
+  const tokenFactory: WeavyTokenFactory = useMemo(
+    () => async (refresh: boolean) => {
+      if (refresh && accessToken) {
+        triggerRefresh()
+      }
+      return accessToken
+    },
+    [accessToken]
+  )
+
+  return { tokenFactory }
 }

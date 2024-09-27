@@ -8,10 +8,10 @@ import {
   WyNotifications,
   WyNotificationsEventType
 } from '@weavy/uikit-react'
-import { useAccessToken, useWeavyUrl } from '../properties/weavy'
+import { useAccessToken, useTokenFactory, useWeavyUrl } from '../properties/weavy'
 
 import '../styles.css'
-import { useOptionalUid } from '../properties/uid'
+import { decodeUid, getComponentParams, useComponentPath, useOptionalUid } from '../properties/uid'
 import {
   useNotificationCount,
   useNotificationDescription,
@@ -20,7 +20,8 @@ import {
 import { useThemeStyles } from '../properties/theme'
 
 export const WeavyNotificationEvents: FC = () => {
-  const { accessToken } = useAccessToken()
+  const { tokenFactory } = useTokenFactory()
+  const { accessToken } = useAccessToken();
   const { weavyUrl } = useWeavyUrl()
   const { setNotificationCount } = useNotificationCount()
   const { setNotificationTitle } = useNotificationTitle()
@@ -35,7 +36,7 @@ export const WeavyNotificationEvents: FC = () => {
 
   const weavy = useWeavy({
     url: weavyUrl,
-    tokenFactory: async () => accessToken,
+    tokenFactory,
     notificationEvents: true
   })
 
@@ -101,9 +102,10 @@ export const WeavyNotificationEvents: FC = () => {
 
 export const WeavyNotifications: FC = () => {
   const { uid } = useOptionalUid()
-  const { accessToken } = useAccessToken()
+  const { tokenFactory } = useTokenFactory()
   const { weavyUrl } = useWeavyUrl()
-  const { themeStyles }  = useThemeStyles()
+  const { themeStyles } = useThemeStyles()
+  const { baseUrl } = useComponentPath()
 
   const [_linkData, setLinkData] = Retool.useStateObject({
     name: 'linkData',
@@ -111,12 +113,25 @@ export const WeavyNotifications: FC = () => {
     description: 'The data from the most recent link event.'
   })
 
-  const triggerLink = Retool.useEventCallback({ name: 'open-link' })
+  const [_navigationUrl, setNavigationUrl] = Retool.useStateString({
+    name: 'navigationUrl',
+    inspector: 'hidden',
+    description: 'The url from the most recent link event app.'
+  })
+
+  const [_navigationParams, setNavigationParams] = Retool.useStateObject({
+    name: 'navigationParams',
+    inspector: 'hidden',
+    description: 'The app navigation params from the most recent link event app.'
+  })
+
+  //const triggerLink = Retool.useEventCallback({ name: 'link' })
+  const triggerNavigate = Retool.useEventCallback({ name: 'navigate' })
   const triggerMessenger = Retool.useEventCallback({ name: 'open-messenger' })
 
   const weavy = useWeavy({
     url: weavyUrl,
-    tokenFactory: async () => accessToken
+    tokenFactory
   })
 
   const handleLink = (e: WyLinkEventType) => {
@@ -132,12 +147,26 @@ export const WeavyNotifications: FC = () => {
     } else if (appUid) {
       // Show a contextual block by navigation to another page
 
-      // The uid should look something like "refine:adb567a"
+      // The uid should look something like "retool:my-chat:adb567a"
       // We have embedded base-64 encoded path information in the uid and to use it we need to decode it.
-      if (appUid.startsWith('retool:')) {
-        triggerLink()
+      const { uid, path } = decodeUid(appUid)
+      if (uid) {
+        console.log("Trying navigate", path, baseUrl)
+        if (path) {
+          const currentPath = new URL(path, baseUrl)
+          setNavigationUrl(currentPath.href)
+          const currentParams = getComponentParams(currentPath.href);
+          setNavigationParams(currentParams)
+        } else {
+          setNavigationUrl('')
+          setNavigationParams({})
+        }
+
+        triggerNavigate()
       }
     }
+
+    //triggerLink()
   }
 
   return <WyNotifications uid={uid} onWyLink={handleLink} style={themeStyles} />
