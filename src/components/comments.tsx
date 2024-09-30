@@ -1,18 +1,23 @@
 import React from 'react'
 import { type FC } from 'react'
 import { useWeavy, WyComments } from '@weavy/uikit-react'
-import { useTokenFactory, useWeavyOptions, useWeavyUrl } from '../properties/weavy'
+import {
+  useTokenFactory,
+  useWeavyOptions,
+  useWeavyUrl
+} from '../properties/weavy'
 
 import '../styles.css'
 import { useEncodedUid } from '../properties/uid'
-import { useThemeStyles } from '../properties/theme'
+import { useThemeMode, useThemeStyles } from '../properties/theme'
 import { useCommentsFeatures } from '../properties/features'
 import { useNotificationProps } from '../properties/notifications'
 
 export const WeavyComments: FC = () => {
-  const { encodedUid } = useEncodedUid();
-  const features = useCommentsFeatures();
+  const { encodedUid } = useEncodedUid()
+  const features = useCommentsFeatures()
   const notifications = useNotificationProps()
+  const { modeClassName } = useThemeMode()
   const { themeStyles } = useThemeStyles()
   const { weavyUrl } = useWeavyUrl()
   const { tokenFactory } = useTokenFactory()
@@ -24,5 +29,13 @@ export const WeavyComments: FC = () => {
     ...weavyOptions
   })
 
-  return <WyComments uid={encodedUid} style={themeStyles} {...notifications} {...features} />
+  return (
+    <WyComments
+      uid={encodedUid}
+      className={modeClassName}
+      style={themeStyles}
+      {...notifications}
+      {...features}
+    />
+  )
 }

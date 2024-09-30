@@ -8,20 +8,30 @@ import {
   WyNotifications,
   WyNotificationsEventType
 } from '@weavy/uikit-react'
-import { useAccessToken, useTokenFactory, useWeavyOptions, useWeavyUrl } from '../properties/weavy'
+import {
+  useAccessToken,
+  useTokenFactory,
+  useWeavyOptions,
+  useWeavyUrl
+} from '../properties/weavy'
 
 import '../styles.css'
-import { decodeUid, getComponentParams, useComponentPath, useOptionalUid } from '../properties/uid'
+import {
+  decodeUid,
+  getComponentParams,
+  useComponentPath,
+  useOptionalUid
+} from '../properties/uid'
 import {
   useNotificationCount,
   useNotificationDescription,
   useNotificationTitle
 } from '../properties/notifications'
-import { useThemeStyles } from '../properties/theme'
+import { useThemeMode, useThemeStyles } from '../properties/theme'
 
 export const WeavyNotificationEvents: FC = () => {
   const { tokenFactory } = useTokenFactory()
-  const { accessToken } = useAccessToken();
+  const { accessToken } = useAccessToken()
   const { weavyUrl } = useWeavyUrl()
   const { setNotificationCount } = useNotificationCount()
   const { setNotificationTitle } = useNotificationTitle()
@@ -102,6 +112,7 @@ export const WeavyNotificationEvents: FC = () => {
 
 export const WeavyNotifications: FC = () => {
   const { uid } = useOptionalUid()
+  const { modeClassName } = useThemeMode()
   const { themeStyles } = useThemeStyles()
   const { baseUrl } = useComponentPath()
   const { weavyUrl } = useWeavyUrl()
@@ -123,7 +134,8 @@ export const WeavyNotifications: FC = () => {
   const [_navigationParams, setNavigationParams] = Retool.useStateObject({
     name: 'navigationParams',
     inspector: 'hidden',
-    description: 'The app navigation params from the most recent link event app.'
+    description:
+      'The app navigation params from the most recent link event app.'
   })
 
   //const triggerLink = Retool.useEventCallback({ name: 'link' })
@@ -153,11 +165,11 @@ export const WeavyNotifications: FC = () => {
       // We have embedded base-64 encoded path information in the uid and to use it we need to decode it.
       const { uid, path } = decodeUid(appUid)
       if (uid) {
-        console.log("Trying navigate", path, baseUrl)
+        console.log('Trying navigate', path, baseUrl)
         if (path) {
           const currentPath = new URL(path, baseUrl)
           setNavigationUrl(currentPath.href)
-          const currentParams = getComponentParams(currentPath.href);
+          const currentParams = getComponentParams(currentPath.href)
           setNavigationParams(currentParams)
         } else {
           setNavigationUrl('')
@@ -171,5 +183,12 @@ export const WeavyNotifications: FC = () => {
     //triggerLink()
   }
 
-  return <WyNotifications uid={uid} onWyLink={handleLink} style={themeStyles} />
+  return (
+    <WyNotifications
+      uid={uid}
+      onWyLink={handleLink}
+      className={modeClassName}
+      style={themeStyles}
+    />
+  )
 }

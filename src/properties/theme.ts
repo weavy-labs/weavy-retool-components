@@ -117,3 +117,13 @@ export const useThemeStyles = () => {
 
     return { themeStyles }
 }
+
+export const useThemeMode = () => {
+    const [darkMode] = Retool.useStateBoolean({
+        name: 'darkMode',
+        label: 'Dark mode',
+        inspector: "checkbox",
+        initialValue: false
+      })
+    return { modeClassName: darkMode ? "wy-dark" :  "" }
+}
