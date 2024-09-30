@@ -1,6 +1,5 @@
 import { Retool } from '@tryretool/custom-component-support'
-
-export type WeavyTokenFactory = (refresh: boolean) => Promise<string>
+import { useEffect, useState } from 'react'
 
 export const useAccessToken = () => {
   const [accessToken] = Retool.useStateString({
@@ -36,12 +35,12 @@ export const useTokenFactory = () => {
   const { accessToken } = useAccessToken()
   const triggerRefresh = Retool.useEventCallback({ name: 'refresh-token' })
 
-  const tokenFactory: WeavyTokenFactory = async (refresh: boolean) => {
-    if (refresh && accessToken) {
+  const tokenFactory = accessToken ? async (refresh: boolean) => {
+    if (refresh) {
       triggerRefresh()
     }
     return accessToken
-  }
+  } : undefined
 
   return { tokenFactory }
 }
