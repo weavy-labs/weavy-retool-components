@@ -14,7 +14,7 @@ import { usePostsFeatures } from '../properties/features'
 import { useNotificationProps } from '../properties/notifications'
 
 export const WeavyPosts: FC = () => {
-  const { encodedUid } = useEncodedUid()
+  const { encodedUid } = useEncodedUid("posts")
   const features = usePostsFeatures()
   const notifications = useNotificationProps()
   const { modeClassName } = useThemeMode()

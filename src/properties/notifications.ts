@@ -36,15 +36,20 @@ export const useNotificationProps = () => {
     inspector: 'checkbox',
     initialValue: true
   })
+
   const [notificationsBadge] = Retool.useStateEnumeration({
     name: 'notificationBadge',
     label: 'Notifications badge',
     enumDefinition: ['count', 'dot', 'none'],
+    enumLabels: { count: 'Number', dot: 'Dot', none: 'None' },
     inspector: 'select',
     initialValue: 'count'
   })
+  
   return {
-    notifications: <'button-list' | 'none'>(enableNotifications ? 'button-list' : 'none'),
-    notificationsBadge: <'count' |'dot' | 'none'>notificationsBadge
+    notifications: <'button-list' | 'none'>(
+      (enableNotifications ? 'button-list' : 'none')
+    ),
+    notificationsBadge: <'count' | 'dot' | 'none'>notificationsBadge
   }
 }

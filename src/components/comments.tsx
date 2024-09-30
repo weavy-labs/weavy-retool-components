@@ -14,7 +14,7 @@ import { useCommentsFeatures } from '../properties/features'
 import { useNotificationProps } from '../properties/notifications'
 
 export const WeavyComments: FC = () => {
-  const { encodedUid } = useEncodedUid()
+  const { encodedUid } = useEncodedUid("comments")
   const features = useCommentsFeatures()
   const notifications = useNotificationProps()
   const { modeClassName } = useThemeMode()

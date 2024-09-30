@@ -10,7 +10,7 @@ export const getComponentParams = (componentUrl: string | URL) => {
   const url = new URL(componentUrl)
   const baseUrl = new URL('.', url)
 
-  const pageName = url.pathname.substring(baseUrl.pathname.length);
+  const pageName = url.pathname.substring(baseUrl.pathname.length)
 
   const hash = url.hash.substring(1)
   const hashQueryParams = new URLSearchParams(hash)
@@ -25,9 +25,10 @@ export const getComponentParams = (componentUrl: string | URL) => {
   }
 }
 
-export const useUid = () => {
+export const useUid = (initialValue?: string) => {
   const [uid] = Retool.useStateString({
     name: 'uid',
+    initialValue: '{{ self.id }}',
     description: 'The uid of the component.'
   })
 
@@ -63,9 +64,9 @@ export const useComponentPath = () => {
   return { componentPath: relPath, baseUrl, componentParams }
 }
 
-export const useEncodedUid = () => {
+export const useEncodedUid = (initialValue?: string) => {
   const { componentPath } = useComponentPath()
-  const { uid } = useUid() || ''
+  const { uid } = useUid() || initialValue || ''
 
   const encodedUid = `retool:${uid}:${btoa(componentPath)}`
 

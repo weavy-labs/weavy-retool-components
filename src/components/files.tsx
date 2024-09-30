@@ -14,7 +14,7 @@ import { useFilesFeatures } from '../properties/features'
 import { useNotificationProps } from '../properties/notifications'
 
 export const WeavyFiles: FC = () => {
-  const { encodedUid } = useEncodedUid()
+  const { encodedUid } = useEncodedUid("files")
   const features = useFilesFeatures()
   const notifications = useNotificationProps()
   const { modeClassName } = useThemeMode()

@@ -85,7 +85,7 @@ export const useThemeColors = () => {
             label: "Primary color",
             initialValue: "{{ theme.primary }}"
         })[0],
-        highlight: Retool.useStateString({
+        /*highlight: Retool.useStateString({
             name: "themeColorHighlight",
             label: "Highlight color",
             initialValue: "{{ theme.highlight }}"
@@ -94,7 +94,7 @@ export const useThemeColors = () => {
             name: "themeColorCanvas",
             label: "Canvas color",
             initialValue: "{{ theme.canvas }}"
-        })[0],
+        })[0],*/
     };
 
     return { themeColors }

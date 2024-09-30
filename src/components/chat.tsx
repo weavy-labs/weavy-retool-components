@@ -14,7 +14,7 @@ import { useChatFeatures } from '../properties/features'
 import { useNotificationProps } from '../properties/notifications'
 
 export const WeavyChat: FC = () => {
-  const { encodedUid } = useEncodedUid()
+  const { encodedUid } = useEncodedUid("chat")
   const features = useChatFeatures()
   const notifications = useNotificationProps()
   const { modeClassName } = useThemeMode()
