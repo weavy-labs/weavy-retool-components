@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "@tryretool/custom-component-support": "^0.0.18",
-    "@weavy/uikit-react": "^24.4.0",
+    "@weavy/uikit-react": "^24.4.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
@@ -37,9 +37,9 @@
     "prettier": "^3.3.3"
   },
   "retoolCustomComponentLibraryConfig": {
-    "name": "WeavyBlocks",
-    "label": "Weavy Blocks",
-    "description": "Wrappers for Weavy block components",
+    "name": "Weavy",
+    "label": "Weavy",
+    "description": "Weavy components",
     "entryPoint": "src/index.tsx",
     "outputPath": "dist"
   }
