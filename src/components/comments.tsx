@@ -1,7 +1,7 @@
 import React from 'react'
 import { type FC } from 'react'
 import { useWeavy, WyComments } from '@weavy/uikit-react'
-import { useTokenFactory, useWeavyUrl } from '../properties/weavy'
+import { useTokenFactory, useWeavyOptions, useWeavyUrl } from '../properties/weavy'
 
 import '../styles.css'
 import { useEncodedUid } from '../properties/uid'
@@ -14,12 +14,14 @@ export const WeavyComments: FC = () => {
   const features = useCommentsFeatures();
   const notifications = useNotificationProps()
   const { themeStyles } = useThemeStyles()
-  const { tokenFactory } = useTokenFactory()
   const { weavyUrl } = useWeavyUrl()
+  const { tokenFactory } = useTokenFactory()
+  const { weavyOptions } = useWeavyOptions()
 
   const weavy = useWeavy({
     url: weavyUrl,
-    tokenFactory
+    tokenFactory,
+    ...weavyOptions
   })
 
   return <WyComments uid={encodedUid} style={themeStyles} {...notifications} {...features} />

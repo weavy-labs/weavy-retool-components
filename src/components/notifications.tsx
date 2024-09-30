@@ -8,7 +8,7 @@ import {
   WyNotifications,
   WyNotificationsEventType
 } from '@weavy/uikit-react'
-import { useAccessToken, useTokenFactory, useWeavyUrl } from '../properties/weavy'
+import { useAccessToken, useTokenFactory, useWeavyOptions, useWeavyUrl } from '../properties/weavy'
 
 import '../styles.css'
 import { decodeUid, getComponentParams, useComponentPath, useOptionalUid } from '../properties/uid'
@@ -102,10 +102,11 @@ export const WeavyNotificationEvents: FC = () => {
 
 export const WeavyNotifications: FC = () => {
   const { uid } = useOptionalUid()
-  const { tokenFactory } = useTokenFactory()
-  const { weavyUrl } = useWeavyUrl()
   const { themeStyles } = useThemeStyles()
   const { baseUrl } = useComponentPath()
+  const { weavyUrl } = useWeavyUrl()
+  const { tokenFactory } = useTokenFactory()
+  const { weavyOptions } = useWeavyOptions()
 
   const [_linkData, setLinkData] = Retool.useStateObject({
     name: 'linkData',
@@ -131,7 +132,8 @@ export const WeavyNotifications: FC = () => {
 
   const weavy = useWeavy({
     url: weavyUrl,
-    tokenFactory
+    tokenFactory,
+    ...weavyOptions
   })
 
   const handleLink = (e: WyLinkEventType) => {

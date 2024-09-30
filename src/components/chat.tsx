@@ -1,7 +1,7 @@
 import React from 'react'
 import { type FC } from 'react'
 import { useWeavy, WyChat } from '@weavy/uikit-react'
-import { useTokenFactory, useWeavyUrl } from '../properties/weavy'
+import { useTokenFactory, useWeavyOptions, useWeavyUrl } from '../properties/weavy'
 
 import '../styles.css'
 import { useEncodedUid } from '../properties/uid'
@@ -14,12 +14,14 @@ export const WeavyChat: FC = () => {
   const features = useChatFeatures();
   const notifications = useNotificationProps()
   const { themeStyles } = useThemeStyles()
-  const { tokenFactory } = useTokenFactory()
   const { weavyUrl } = useWeavyUrl()
+  const { tokenFactory } = useTokenFactory()
+  const { weavyOptions } = useWeavyOptions()
 
   const weavy = useWeavy({
     url: weavyUrl,
-    tokenFactory
+    tokenFactory,
+    ...weavyOptions
   })
 
   return <WyChat uid={encodedUid} style={themeStyles} {...notifications} {...features} />

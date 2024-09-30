@@ -8,6 +8,9 @@ const extractPath = (url: string) => {
 
 export const getComponentParams = (componentUrl: string | URL) => {
   const url = new URL(componentUrl)
+  const baseUrl = new URL('.', url)
+
+  const pageName = url.pathname.substring(baseUrl.pathname.length);
 
   const hash = url.hash.substring(1)
   const hashQueryParams = new URLSearchParams(hash)
@@ -16,6 +19,7 @@ export const getComponentParams = (componentUrl: string | URL) => {
   const hashParams = Object.fromEntries(hashQueryParams.entries())
 
   return {
+    pageName,
     queryParams,
     hashParams
   }
