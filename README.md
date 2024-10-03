@@ -1,10 +1,41 @@
-## Custom component libraries template
+# Weavy Retool components
 
-Use this as a base for new custom component library projects within [Retool](https://www.retool.com).
+## Custom component library template
 
-To learn more about how custom component libraries work, visit our [official documentation](https://docs.retool.com/apps/web/guides/components/develop-custom-components/custom-components-beta).
+This is a custom component library for projects within [Retool](https://www.retool.com).
+
+To learn more about how custom component libraries work, visit the [official documentation](https://docs.retool.com/apps/web/guides/components/develop-custom-components/custom-components-beta).
 
 **You need to register these components in your account to be able to use them.**
+
+### Install
+
+To be able to use and publish the components, you need to install the dependencies.
+
+```bash
+npm install
+```
+
+### Sign in to Retool
+
+To use the Retool utils for development and publishing, first sign into your Retool account.
+
+```bash
+npx retool-ccl login
+```
+
+### Init the library
+
+To be able to upload your library to Retool, you must first register the library within your Retool account.
+
+```bash
+npx retool-ccl init
+```
+
+The following properties are recommended, but you may customize it as you like.
+
+- Name: "Weavy"
+- Description: "Weavy components"
 
 ### Develop
 
@@ -28,30 +59,43 @@ npm run deploy
 
 Set up two configuration variables for environment url and Api key in you [Settings > Configuration variables](https://docs.retool.com/org-users/guides/config-vars#create-configuration-variables). You may specify different environment/api key for staging and production.
 
-* WEAVY_URL: *Your Environment URL*
-* WEAVY_APIKEY: *Your wys_*** API key **Note: this should be set as secret**.
+- WEAVY_URL: *Your Environment URL*
+- WEAVY_APIKEY: *Your wys_*** API key **Note: this should be set as secret**.
 
-### Set up queries
+### Set up workflow and queries
 
-The queries will provide your components with user tokens and a weavy configuration.
+The queries will provide your apps and components with user tokens for Weavy.
 
-#### getWeavyToken()
+#### Upload the `WeavyRetoolWorkFlow.json`
 
-Yadayada `WeavyRetoolWorkFlow`.
+- Go to *Workflows* in Retool.
+- Click **Create New** and select **From JSON**.
+- Choose to **Upload a file** and select [queries/WeavyRetoolWorkflow.json](./queries/WeavyRetoolWorkflow.json) in the modal and then **Create workflow**.
+- All settings are already included, so all you have to do is Deploy (up to the right).
+  - If the Deploy button is disabled, it's either already deployed (look for the text Latest version deployed), or some of the settings might not have loaded correctly - refresh, and it should be working.
+  - Any message about no triggers configured can be ignored.
 
-* Name the query `getWeavyToken`.
+#### Use the workflow in an app query
 
-#### getWeavyConfig()
+To activate and use the workflow your Retool app, you need to add a query that is using the workflow.
 
-Create a JS function query. The function may only return JSON compatible data (only strings/numbers/booleans and no functions/instances).
+- Open your Retool app editor and go to the **<> Code** panel.
+- Click on **＋ Add query** and choose Import Workflow.
+- Name the query `getWeavyToken`.
+- Select **Workflow** and choose **WeavyRetoolWorkflow**.
+  
+  The Workflow parameters should be defaulted with the data shown below. Otherwise you can set it as *raw* data.
 
-```js
-return {
-  url: retoolContext.configVars.WEAVY_URL
-}
-```
+  ```json
+  { 
+    "uid" : {{ current_user.sid }}, 
+    "fullname" : {{ current_user.fullName }}, 
+    "email" : {{ current_user.email }}, 
+    "avatar" : {{ current_user.profilePhotoUrl }}
+  }
+  ```
 
-* Name the query `getWeavyConfig`.
+- **Save** the query and give it a **run** to try it out!
 
 ### Using weavy components
 
