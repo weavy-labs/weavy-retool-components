@@ -7,7 +7,7 @@
     "deploy": "retool-ccl deploy"
   },
   "dependencies": {
-    "@tryretool/custom-component-support": "^0.0.18",
+    "@tryretool/custom-component-support": "^1.1.0",
     "@weavy/uikit-react": "^24.4.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
