@@ -13,6 +13,7 @@ export const useNotificationCount = () => {
 export const useNotificationTitle = () => {
   const [_notificationTitle, setNotificationTitle] = Retool.useStateString({
     name: 'notificationTitle',
+    initialValue: '',
     inspector: 'hidden',
     description: 'The title of the most recent notification event.'
   })
@@ -23,6 +24,7 @@ export const useNotificationDescription = () => {
   const [_notificationDescription, setNotificationDescription] =
     Retool.useStateString({
       name: 'notificationDescription',
+      initialValue: '',
       inspector: 'hidden',
       description: 'The description of the most recent notification event.'
     })
