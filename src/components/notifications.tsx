@@ -139,9 +139,11 @@ export const WeavyNotifications: FC = () => {
       'The app navigation params from the most recent link event app.'
   })
 
-  //const triggerLink = Retool.useEventCallback({ name: 'link' })
   const triggerNavigate = Retool.useEventCallback({ name: 'navigate' })
-  const triggerMessenger = Retool.useEventCallback({ name: 'open-messenger' })
+  
+  // Reserved for future use
+  //const triggerLink = Retool.useEventCallback({ name: 'link' })
+  //const triggerMessenger = Retool.useEventCallback({ name: 'open-messenger' })
 
   const weavy = useWeavy({
     url: weavyUrl,
@@ -158,7 +160,7 @@ export const WeavyNotifications: FC = () => {
     // Check if the appType guid exists in the ConversationTypes map
     if (ConversationTypes.has(appType as string)) {
       // Show the messenger
-      triggerMessenger()
+      //triggerMessenger()
     } else if (appUid) {
       // Show a contextual block by navigation to another page
 
