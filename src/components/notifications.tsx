@@ -19,7 +19,6 @@ import '../styles.css'
 import {
   decodeUid,
   getComponentParams,
-  useComponentPath,
   useOptionalUid
 } from '../properties/uid'
 import {
@@ -114,25 +113,27 @@ export const WeavyNotifications: FC = () => {
   const { uid } = useOptionalUid()
   const { modeClassName } = useThemeMode()
   const { themeStyles } = useThemeStyles()
-  const { baseUrl } = useComponentPath()
   const { weavyUrl } = useWeavyUrl()
   const { tokenFactory } = useTokenFactory()
   const { weavyOptions } = useWeavyOptions()
 
   const [_linkData, setLinkData] = Retool.useStateObject({
     name: 'linkData',
+    initialValue: {},
     inspector: 'hidden',
     description: 'The data from the most recent link event.'
   })
 
-  const [_navigationUrl, setNavigationUrl] = Retool.useStateString({
-    name: 'navigationUrl',
+  const [_navigateAppUuid, setNavigateAppUuid] = Retool.useStateString({
+    name: 'navigateAppUuid',
+    initialValue: '',
     inspector: 'hidden',
-    description: 'The url from the most recent link event app.'
+    description: 'The Retool app uuid from the most recent link event app.'
   })
 
-  const [_navigationParams, setNavigationParams] = Retool.useStateObject({
-    name: 'navigationParams',
+  const [_navigateParams, setNavigateParams] = Retool.useStateObject({
+    name: 'navigateParams',
+    initialValue: {},
     inspector: 'hidden',
     description:
       'The app navigation params from the most recent link event app.'
@@ -161,19 +162,17 @@ export const WeavyNotifications: FC = () => {
     } else if (appUid) {
       // Show a contextual block by navigation to another page
 
-      // The uid should look something like "retool:my-chat:adb567a"
+      // The uid should look something like "retool:my-chat:abcde-1235:adb567a"
       // We have embedded base-64 encoded path information in the uid and to use it we need to decode it.
-      const { uid, path } = decodeUid(appUid)
+      const { uid, appUuid: componentUuid, relPath } = decodeUid(appUid)
       if (uid) {
-        console.log('Trying navigate', path, baseUrl)
-        if (path) {
-          const currentPath = new URL(path, baseUrl)
-          setNavigationUrl(currentPath.href)
-          const currentParams = getComponentParams(currentPath.href)
-          setNavigationParams(currentParams)
+        if (relPath) {
+          setNavigateAppUuid(componentUuid)
+          const currentParams = getComponentParams(relPath)
+          setNavigateParams(currentParams)
         } else {
-          setNavigationUrl('')
-          setNavigationParams({})
+          setNavigateAppUuid('')
+          setNavigateParams({})
         }
 
         triggerNavigate()

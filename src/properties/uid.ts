@@ -1,31 +1,61 @@
 import { Retool } from '@tryretool/custom-component-support'
 
-const extractPath = (url: string) => {
-  const baseUrl = new URL('.', url)
-  const relPath = url.split(baseUrl.pathname, 2)[1]
-  return { baseUrl: baseUrl.href, relPath }
+export type OpenAppParameters = {
+  pageName?: string
+  queryParams?: {
+    [k: string]: string
+  }
+  hashParams?: {
+    [k: string]: string
+  }
 }
 
-export const getComponentParams = (componentUrl: string | URL) => {
-  const url = new URL(componentUrl)
-  const baseUrl = new URL('.', url)
+// Match retool url paths starting with /app/... or /editor/...
+const pathRegex =
+  /\/(app\/[^#\?\/]+|editor\/[^\/]+\/[^#\?\/]+)\/?(?<relPath>.*)$/
 
-  const pageName = url.pathname.substring(baseUrl.pathname.length)
+// Extracts pageName, search and hash from a relPath
+const relRegex =
+  /\/?(?<pageName>[^\/?#]*)([?](?<search>[^#]*))?(#(?<hash>[^#]*))?$/
 
-  const hash = url.hash.substring(1)
-  const hashQueryParams = new URLSearchParams(hash)
+const extractPath = (url: string) => {
+  const result = url.match(pathRegex)
+  let relPath = ''
 
-  const queryParams = Object.fromEntries(url.searchParams.entries())
+  if (result && result?.groups?.relPath) {
+    relPath = result?.groups?.relPath
+  } else {
+    // Fallback extraction
+    const baseUrl = new URL('.', url)
+    relPath = url.split(baseUrl.pathname, 2)[1]
+  }
+
+  return { relPath }
+}
+
+export const getComponentParams = (relPath: string) => {
+  const result = relPath.match(relRegex)
+
+  if (!result || !result.groups) {
+    throw Error('Invalid relPath')
+  }
+
+  const pageName = result.groups.pageName || undefined
+
+  const searchQueryParams = new URLSearchParams(result.groups.search)
+  const hashQueryParams = new URLSearchParams(result.groups.hash)
+
+  const queryParams = Object.fromEntries(searchQueryParams.entries())
   const hashParams = Object.fromEntries(hashQueryParams.entries())
 
-  return {
+  return <OpenAppParameters>{
     pageName,
     queryParams,
     hashParams
   }
 }
 
-export const useUid = (initialValue?: string) => {
+export const useUid = () => {
   const [uid] = Retool.useStateString({
     name: 'uid',
     initialValue: '{{ self.id }}',
@@ -45,6 +75,16 @@ export const useOptionalUid = () => {
   return { uid }
 }
 
+export const useAppUuid = () => {
+  const [appUuid] = Retool.useStateString({
+    name: 'appUuid',
+    description: 'The uuid of the app.',
+    initialValue: '{{ retoolContext.appUuid }}',
+    inspector: 'hidden'
+  })
+  return { appUuid }
+}
+
 export const useComponentPath = () => {
   const [componentUrl] = Retool.useStateString({
     name: 'componentPath',
@@ -54,29 +94,38 @@ export const useComponentPath = () => {
   })
 
   let relPath = ''
-  let baseUrl = ''
   let componentParams = {}
 
   if (componentUrl) {
-    ;({ relPath, baseUrl } = extractPath(componentUrl))
-    componentParams = getComponentParams(componentUrl)
+    relPath = extractPath(componentUrl).relPath
+    componentParams = getComponentParams(relPath)
   }
-  return { componentPath: relPath, baseUrl, componentParams }
+  return { componentPath: relPath, componentParams }
 }
 
 export const useEncodedUid = (initialValue?: string) => {
+  const { appUuid } = useAppUuid()
   const { componentPath } = useComponentPath()
   const { uid } = useUid() || initialValue || ''
 
-  const encodedUid = `retool:${uid}:${btoa(componentPath)}`
+  const encodedUid = `retool:${uid}:${appUuid}:${btoa(componentPath)}`
+
+  const [_encodedUid, setEncodedUid] = Retool.useStateString({
+    name: 'encodedUid',
+    initialValue: '',
+    inspector: 'hidden',
+    description: 'The encoded uid for the Weavy component.'
+  })
+
+  setEncodedUid(encodedUid)
 
   return { encodedUid }
 }
 
 export const decodeUid = (encodedUid: string) => {
   if (encodedUid.startsWith('retool:')) {
-    const [_prefix, uid, encodedPath] = encodedUid.split(':')
-    return { uid, path: atob(encodedPath) }
+    const [_prefix, uid, appUuid, encodedPath] = encodedUid.split(':', 4)
+    return { uid, appUuid, relPath: atob(encodedPath) }
   }
-  return { uid: undefined, path: undefined }
+  return { uid: undefined, appUuid: undefined, relPath: undefined }
 }
