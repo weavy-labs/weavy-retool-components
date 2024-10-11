@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "login": "retool login && retool-ccl login",
+    "create": "npm run create-variables && npm run create-workflow && npm run create-components && npm run create-demo",
     "create-variables": "node scripts/init-config-variables.js",
     "create-workflow": "node scripts/upload-workflow.js",
     "create-components": "node scripts/init-components.js",

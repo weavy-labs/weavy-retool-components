@@ -94,48 +94,47 @@ async function createConfigVariable(
 getAndVerifyCredentialsWithRetoolDB().then(async (credentials) => {
   const environments = await getEnvironments(credentials)
 
-  if (!environments.length) {
-    console.log(environments);
-    throw new Error("No environments available")
-  }
-
-  let configVars = await getConfigVariables(credentials)
-
-  console.log(configVars)
-
-  if (!configVars.find((configVar) => configVar.name === 'WEAVY_URL')) {
-    if (process.env.WEAVY_URL) {
-      //configVars.push(
-        await createConfigVariable(
-          'WEAVY_URL',
-          'URL to Weavy environment',
-          process.env.WEAVY_URL,
-          false,
-          environments,
-          credentials
-        )
-      //)
-    } else {
-      console.warn('No WEAVY_URL configured in .env')
+  if (environments.length) {
+    let configVars = await getConfigVariables(credentials)
+  
+    if (!configVars.find((configVar) => configVar.name === 'WEAVY_URL')) {
+      if (process.env.WEAVY_URL) {
+        
+        try {
+          await createConfigVariable(
+            'WEAVY_URL',
+            'URL to Weavy environment',
+            process.env.WEAVY_URL,
+            false,
+            environments,
+            credentials
+          )
+          console.log("Added WEAVY_URL configuration variable")
+        } catch(e) {
+          console.warn('Could not add WEAVY_URL configuration variable')
+        }
+      } else {
+        console.warn('No WEAVY_URL configured in .env')
+      }
+    }
+    if (!configVars.find((configVar) => configVar.name === 'WEAVY_APIKEY')) {
+      if (process.env.WEAVY_APIKEY) {
+        try {
+          await createConfigVariable(
+            'WEAVY_APIKEY',
+            'API key for Weavy environment',
+            process.env.WEAVY_APIKEY,
+            true,
+            environments,
+            credentials
+          )
+          console.log("Added WEAVY_APIKEY configuration variable")
+        } catch(e) {
+          console.warn('Could not add WEAVY_APIKEY configuration variable')
+        }
+      } else {
+        console.warn('No WEAVY_APIKEY configured in .env')
+      }
     }
   }
-  if (!configVars.find((configVar) => configVar.name === 'WEAVY_APIKEY')) {
-    if (process.env.WEAVY_APIKEY) {
-      //configVars.push(
-        await createConfigVariable(
-          'WEAVY_APIKEY',
-          'API key for Weavy environment',
-          process.env.WEAVY_APIKEY,
-          true,
-          environments,
-          credentials
-        )
-      //)
-    } else {
-      console.warn('No WEAVY_APIKEY configured in .env')
-    }
-  }
-
-
-  console.log('configVars')
 })
