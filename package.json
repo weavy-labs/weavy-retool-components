@@ -3,11 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "login": "retool login && retool-ccl login",
+    "create-variables": "node scripts/init-config-variables.js",
+    "create-workflow": "node scripts/upload-workflow.js",
+    "create-components": "node scripts/init-components.js",
+    "create-demo": "node scripts/upload-app.js",
     "dev": "retool-ccl dev",
     "deploy": "retool-ccl deploy"
   },
   "dependencies": {
-    "@tryretool/custom-component-support": "^1.1.0",
     "@weavy/uikit-react": "^24.4.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
@@ -28,13 +32,16 @@
     ]
   },
   "devDependencies": {
+    "@tryretool/custom-component-support": "^1.1.0",
     "@types/react": "^18.3.8",
     "@typescript-eslint/eslint-plugin": "^8.6.0",
     "@typescript-eslint/parser": "^8.6.0",
+    "dotenv": "^16.4.5",
     "eslint": "^9.11.0",
     "eslint-plugin-react": "^7.36.1",
     "postcss-modules": "^6.0.0",
-    "prettier": "^3.3.3"
+    "prettier": "^3.3.3",
+    "retool-cli": "^1.0.29"
   },
   "retoolCustomComponentLibraryConfig": {
     "name": "Weavy",

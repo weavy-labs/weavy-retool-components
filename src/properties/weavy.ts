@@ -15,7 +15,7 @@ export const useWeavyUrl = () => {
   const [weavyUrl] = Retool.useStateString({
     name: 'weavyUrl',
     label: 'Weavy environment URL *',
-    initialValue: '{{ retoolContext.configVars.WEAVY_URL }}',
+    initialValue: '{{ WEAVY_URL?.value || retoolContext.configVars?.WEAVY_URL }}',
     description: 'The url to the weavy environment'
   })
   return { weavyUrl }
