@@ -5,8 +5,10 @@ const {
 } = require('retool-cli/lib/utils//credentials')
 const { postRequest } = require('retool-cli/lib/utils/networking')
 const { getWorkflowsAndFolders } = require('retool-cli/lib/utils/workflows')
+const { getAppsAndFolders, deleteApp } = require('retool-cli/lib/utils/apps')
 const chalk = require('chalk')
 const ora = require('ora')
+const inquirer = require("inquirer");
 
 const weavyComponents = require('../weavy-components.json')
 const demoApp = require('../demo/weavy-components-basic-layout.json')
@@ -24,7 +26,6 @@ async function createWeavyApp(appName, credentials) {
   )
   console.log(workflowData.name, weavyWorkflow?.id)
 
-  const spinner = ora('Creating App').start()
   let appState = demoApp.page.data.appState
 
   // Relink Weavy component library uuid
@@ -43,6 +44,29 @@ async function createWeavyApp(appName, credentials) {
         `{{ retoolContext.configVars?.WEAVY_URL || \\"${process.env.WEAVY_URL}\\" }}`
       )
   }
+
+  const appsAndFolders = await getAppsAndFolders(credentials)
+
+  const existingApp = appsAndFolders.apps.find((app) => app.name === appName)
+
+  if (existingApp) {
+    const replace = await inquirer.prompt([
+        {
+            name: "confirm",
+            message: "Do you want to replace the existing ".concat(appName, "?"),
+            type: "confirm",
+            default: false
+        },
+    ])
+
+    if (replace.confirm) {
+        deleteApp(appName, credentials, false)
+    } else {
+        process.exit(1)
+    }
+  }
+
+  const spinner = ora('Creating App').start()
 
   const createAppResult = await postRequest(
     `${credentials.origin}/api/pages/createPage`,
