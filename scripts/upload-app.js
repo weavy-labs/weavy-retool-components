@@ -8,7 +8,7 @@ const { getWorkflowsAndFolders } = require('retool-cli/lib/utils/workflows')
 const { getAppsAndFolders, deleteApp } = require('retool-cli/lib/utils/apps')
 const chalk = require('chalk')
 const ora = require('ora')
-const inquirer = require("inquirer");
+const inquirer = require('inquirer')
 
 const weavyComponents = require('../weavy-components.json')
 const demoApp = require('../demo/weavy-components-basic-layout.json')
@@ -17,6 +17,8 @@ const workflowData = require('../queries/WeavyRetoolWorkflow.json')
 const uuidRegex = /"collectionUuid","(?<uuid>[0-9a-f\-]+)"/gm
 const revUuidRegex = /"collectionRevisionUuid","(?<revUuid>[0-9a-f\-]+)"/gm
 const workflowRegex = /"workflowId","(?<workflowId>[0-9a-f\-]+)"/gm
+const envRegex =
+  /{{ retoolContext\.configVars\?\.WEAVY_URL \|\| \\"(?<url>[^\"]*)\\" }}/gm
 
 async function createWeavyApp(appName, credentials) {
   const { workflows } = await getWorkflowsAndFolders(credentials)
@@ -30,20 +32,29 @@ async function createWeavyApp(appName, credentials) {
 
   // Relink Weavy component library uuid
 
-  appState = appState.replace(uuidRegex, `"collectionUuid","${weavyComponents.customComponentLibraryId}"`)
-  appState = appState.replace(revUuidRegex, `"collectionRevisionUuid","${weavyComponents.id}"`)
+  appState = appState.replace(
+    uuidRegex,
+    `"collectionUuid","${weavyComponents.customComponentLibraryId}"`
+  )
+  appState = appState.replace(
+    revUuidRegex,
+    `"collectionRevisionUuid","${weavyComponents.id}"`
+  )
 
   if (weavyWorkflow) {
     // Relink workflow uuid
-    appState = appState.replace(workflowRegex, `"workflowId","${weavyWorkflow.id}"`)
+    appState = appState.replace(
+      workflowRegex,
+      `"workflowId","${weavyWorkflow.id}"`
+    )
   }
 
   if (process.env.WEAVY_URL) {
-      // Patch environment variable
-      appState = appState.replace(
-        '{{ retoolContext.configVars.WEAVY_URL }}',
-        `{{ retoolContext.configVars?.WEAVY_URL || \\"${process.env.WEAVY_URL}\\" }}`
-      )
+    // Patch environment variable
+    appState = appState.replace(
+      envRegex,
+      `{{ retoolContext.configVars?.WEAVY_URL || \\"${process.env.WEAVY_URL}\\" }}`
+    )
   }
 
   const appsAndFolders = await getAppsAndFolders(credentials)
@@ -52,18 +63,18 @@ async function createWeavyApp(appName, credentials) {
 
   if (existingApp) {
     const replace = await inquirer.prompt([
-        {
-            name: "confirm",
-            message: "Do you want to replace the existing ".concat(appName, "?"),
-            type: "confirm",
-            default: false
-        },
+      {
+        name: 'confirm',
+        message: 'Do you want to replace the existing '.concat(appName, '?'),
+        type: 'confirm',
+        default: false
+      }
     ])
 
     if (replace.confirm) {
-        await deleteApp(appName, credentials, false)
+      await deleteApp(appName, credentials, false)
     } else {
-        process.exit(1)
+      process.exit(1)
     }
   }
 
