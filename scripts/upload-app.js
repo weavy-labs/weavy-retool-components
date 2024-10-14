@@ -14,9 +14,9 @@ const weavyComponents = require('../weavy-components.json')
 const demoApp = require('../demo/weavy-components-basic-layout.json')
 const workflowData = require('../queries/WeavyRetoolWorkflow.json')
 
-const COMPONENT_LIB_UUID = 'd662d7bf-07d4-40de-83a5-2f4ad6d90f43'
-const COMPONENT_LIB_REVISION_ID = '10dca0bd-827a-4bdb-9ea4-89f917bd5657'
-const WORKFLOW_UUID = '3901f3b1-8dd4-40fd-b217-fa393c35c3bf'
+const uuidRegex = /"collectionUuid","(?<uuid>[0-9a-f\-]+)"/gm
+const revUuidRegex = /"collectionRevisionUuid","(?<revUuid>[0-9a-f\-]+)"/gm
+const workflowRegex = /"workflowId","(?<workflowId>[0-9a-f\-]+)"/gm
 
 async function createWeavyApp(appName, credentials) {
   const { workflows } = await getWorkflowsAndFolders(credentials)
@@ -29,12 +29,13 @@ async function createWeavyApp(appName, credentials) {
   let appState = demoApp.page.data.appState
 
   // Relink Weavy component library uuid
-  appState = appState.replace(COMPONENT_LIB_UUID, weavyComponents.customComponentLibraryId)
-  appState = appState.replace(COMPONENT_LIB_REVISION_ID, weavyComponents.id)
+
+  appState = appState.replace(uuidRegex, `"collectionUuid","${weavyComponents.customComponentLibraryId}"`)
+  appState = appState.replace(revUuidRegex, `"collectionRevisionUuid","${weavyComponents.id}"`)
 
   if (weavyWorkflow) {
     // Relink workflow uuid
-    appState = appState.replace(WORKFLOW_UUID, weavyWorkflow.id)
+    appState = appState.replace(workflowRegex, `"workflowId","${weavyWorkflow.id}"`)
   }
 
   if (process.env.WEAVY_URL) {
@@ -60,7 +61,7 @@ async function createWeavyApp(appName, credentials) {
     ])
 
     if (replace.confirm) {
-        deleteApp(appName, credentials, false)
+        await deleteApp(appName, credentials, false)
     } else {
         process.exit(1)
     }
