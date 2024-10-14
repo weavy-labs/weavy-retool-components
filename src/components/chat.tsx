@@ -8,12 +8,13 @@ import {
 } from '../properties/weavy'
 
 import '../styles.css'
-import { useEncodedUid } from '../properties/uid'
+import { useEncodedUid, useName } from '../properties/uid'
 import { useThemeMode, useThemeStyles } from '../properties/theme'
 import { useChatFeatures } from '../properties/features'
 import { useNotificationProps } from '../properties/notifications'
 
 export const WeavyChat: FC = () => {
+  const { name } = useName()
   const { encodedUid } = useEncodedUid("chat")
   const features = useChatFeatures()
   const notifications = useNotificationProps()
@@ -32,6 +33,7 @@ export const WeavyChat: FC = () => {
   return (
     <WyChat
       uid={encodedUid}
+      name={name}
       className={modeClassName}
       style={themeStyles}
       {...notifications}

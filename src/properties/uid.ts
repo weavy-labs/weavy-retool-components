@@ -55,6 +55,16 @@ export const getComponentParams = (relPath: string) => {
   }
 }
 
+export const useName = () => {
+  const [name] = Retool.useStateString({
+    name: 'name',
+    label: "Display name",
+    description: 'The display name of the component. Used in notifications etc.'
+  })
+
+  return { name: name || undefined }
+}
+
 export const useUid = () => {
   const [uid] = Retool.useStateString({
     name: 'uid',

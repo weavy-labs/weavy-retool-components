@@ -8,12 +8,13 @@ import {
 } from '../properties/weavy'
 
 import '../styles.css'
-import { useEncodedUid } from '../properties/uid'
+import { useEncodedUid, useName } from '../properties/uid'
 import { useThemeMode, useThemeStyles } from '../properties/theme'
 import { useFilesFeatures } from '../properties/features'
 import { useNotificationProps } from '../properties/notifications'
 
 export const WeavyFiles: FC = () => {
+  const { name } = useName()
   const { encodedUid } = useEncodedUid("files")
   const features = useFilesFeatures()
   const notifications = useNotificationProps()
@@ -32,6 +33,7 @@ export const WeavyFiles: FC = () => {
   return (
     <WyFiles
       uid={encodedUid}
+      name={name}
       className={modeClassName}
       style={themeStyles}
       {...notifications}

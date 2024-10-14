@@ -8,12 +8,13 @@ import {
 } from '../properties/weavy'
 
 import '../styles.css'
-import { useEncodedUid } from '../properties/uid'
+import { useEncodedUid, useName } from '../properties/uid'
 import { useThemeMode, useThemeStyles } from '../properties/theme'
 import { useCommentsFeatures } from '../properties/features'
 import { useNotificationProps } from '../properties/notifications'
 
 export const WeavyComments: FC = () => {
+  const { name } = useName()
   const { encodedUid } = useEncodedUid("comments")
   const features = useCommentsFeatures()
   const notifications = useNotificationProps()
@@ -32,6 +33,7 @@ export const WeavyComments: FC = () => {
   return (
     <WyComments
       uid={encodedUid}
+      name={name}
       className={modeClassName}
       style={themeStyles}
       {...notifications}

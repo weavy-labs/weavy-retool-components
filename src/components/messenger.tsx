@@ -11,8 +11,10 @@ import '../styles.css'
 import { useThemeMode, useThemeStyles } from '../properties/theme'
 import { useMessengerFeatures } from '../properties/features'
 import { Retool } from '@tryretool/custom-component-support'
+import { useName } from '../properties/uid'
 
 export const WeavyMessenger: FC = () => {
+  const { name } = useName()
   const [bot] = Retool.useStateString({
     name: 'bot',
     description: 'Optional bot mode'
@@ -33,6 +35,7 @@ export const WeavyMessenger: FC = () => {
 
   return (
     <WyMessenger
+      name={name}
       bot={bot}
       className={modeClassName}
       style={themeStyles}

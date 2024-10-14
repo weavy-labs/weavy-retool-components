@@ -18,7 +18,7 @@ const uuidRegex = /"collectionUuid","(?<uuid>[0-9a-f\-]+)"/gm
 const revUuidRegex = /"collectionRevisionUuid","(?<revUuid>[0-9a-f\-]+)"/gm
 const workflowRegex = /"workflowId","(?<workflowId>[0-9a-f\-]+)"/gm
 const envRegex =
-  /{{ retoolContext\.configVars\?\.WEAVY_URL \|\| \\"(?<url>[^\"]*)\\" }}/gm
+  /window\.WEAVY_URL = \\"(?<url>[^\"]*)\\"/gm
 
 async function createWeavyApp(appName, credentials) {
   const { workflows } = await getWorkflowsAndFolders(credentials)
@@ -53,7 +53,7 @@ async function createWeavyApp(appName, credentials) {
     // Patch environment variable
     appState = appState.replace(
       envRegex,
-      `{{ retoolContext.configVars?.WEAVY_URL || \\"${process.env.WEAVY_URL}\\" }}`
+      `window.WEAVY_URL = \\"${process.env.WEAVY_URL}\\"`
     )
   }
 
