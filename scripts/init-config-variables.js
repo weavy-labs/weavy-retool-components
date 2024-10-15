@@ -1,13 +1,18 @@
-require('dotenv').config();
+require('dotenv').config()
 
 const {
   getAndVerifyCredentialsWithRetoolDB
 } = require('retool-cli/lib/utils/credentials')
-const { getRequest, postRequest } = require('retool-cli/lib/utils/networking')
+const {
+  getRequest,
+  postRequest,
+  deleteRequest
+} = require('retool-cli/lib/utils/networking')
 const package = require('../package.json')
 const fs = require('node:fs')
 const chalk = require('chalk')
 const ora = require('ora')
+const inquirer = require('inquirer')
 
 async function getEnvironments(credentials) {
   const spinner = ora('Getting Retool environments').start()
@@ -91,50 +96,112 @@ async function createConfigVariable(
   return configVar
 }
 
+async function deleteConfigVariable(variable, credentials) {
+  const spinner = ora('Deleting config variables').start()
+
+  try {
+    const deleteConfigVarsResult = await deleteRequest(
+      `${credentials.origin}/api/configVars/${variable.uuid}`
+    )
+    spinner.stop()
+  } catch (e) {
+    spinner.stop()
+    console.error('Error deleting variable:', e.errorMessage)
+    throw e
+  }
+}
+
 getAndVerifyCredentialsWithRetoolDB().then(async (credentials) => {
   const environments = await getEnvironments(credentials)
 
   if (environments.length) {
     let configVars = await getConfigVariables(credentials)
-  
-    if (!configVars.find((configVar) => configVar.name === 'WEAVY_URL')) {
-      if (process.env.WEAVY_URL) {
-        
-        try {
-          await createConfigVariable(
-            'WEAVY_URL',
-            'URL to Weavy environment',
-            process.env.WEAVY_URL,
-            false,
-            environments,
-            credentials
-          )
-          console.log("Added WEAVY_URL configuration variable")
-        } catch(e) {
-          console.warn('Could not add WEAVY_URL configuration variable')
+
+    let existingConfigVar = configVars.find(
+      (configVar) => configVar.name === 'WEAVY_URL'
+    )
+
+    if (existingConfigVar) {
+      const replace = await inquirer.prompt([
+        {
+          name: 'confirm',
+          message:
+            'Do you want to replace the existing configuration variable '.concat(
+              existingConfigVar.name,
+              '?'
+            ),
+          type: 'confirm',
+          default: false
         }
+      ])
+
+      if (replace.confirm) {
+        await deleteConfigVariable(existingConfigVar, credentials)
+        existingConfigVar = null
       } else {
-        console.warn('No WEAVY_URL configured in .env')
+        process.exit(1)
       }
     }
-    if (!configVars.find((configVar) => configVar.name === 'WEAVY_APIKEY')) {
-      if (process.env.WEAVY_APIKEY) {
-        try {
-          await createConfigVariable(
-            'WEAVY_APIKEY',
-            'API key for Weavy environment',
-            process.env.WEAVY_APIKEY,
-            true,
-            environments,
-            credentials
-          )
-          console.log("Added WEAVY_APIKEY configuration variable")
-        } catch(e) {
-          console.warn('Could not add WEAVY_APIKEY configuration variable')
-        }
-      } else {
-        console.warn('No WEAVY_APIKEY configured in .env')
+
+    if (process.env.WEAVY_URL !== undefined) {
+      try {
+        await createConfigVariable(
+          'WEAVY_URL',
+          'URL to Weavy environment',
+          process.env.WEAVY_URL,
+          false,
+          environments,
+          credentials
+        )
+        console.log('Added WEAVY_URL configuration variable')
+      } catch (e) {
+        console.warn('Could not add WEAVY_URL configuration variable')
       }
+    } else {
+      console.warn('No WEAVY_URL configured in .env')
+    }
+
+    existingConfigVar = configVars.find(
+      (configVar) => configVar.name === 'WEAVY_APIKEY'
+    )
+
+    if (existingConfigVar) {
+      const replace = await inquirer.prompt([
+        {
+          name: 'confirm',
+          message:
+            'Do you want to replace the existing configuration variable '.concat(
+              existingConfigVar.name,
+              '?'
+            ),
+          type: 'confirm',
+          default: false
+        }
+      ])
+
+      if (replace.confirm) {
+        await deleteConfigVariable(existingConfigVar, credentials)
+      } else {
+        process.exit(1)
+      }
+    }
+
+    if (process.env.WEAVY_APIKEY !== undefined) {
+      try {
+        await createConfigVariable(
+          'WEAVY_APIKEY',
+          'API key for Weavy environment',
+          process.env.WEAVY_APIKEY,
+          true,
+          environments,
+          credentials
+        )
+        console.log('Added WEAVY_APIKEY configuration variable')
+      } catch (e) {
+        console.warn('Could not add WEAVY_APIKEY configuration variable')
+      }
+    } else {
+      console.warn('No WEAVY_APIKEY configured in .env')
     }
   }
 })
