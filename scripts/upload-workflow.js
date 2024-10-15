@@ -1,13 +1,18 @@
+require('dotenv').config()
+
 const {
   getAndVerifyCredentialsWithRetoolDB
 } = require('retool-cli/lib/utils//credentials')
 const { postRequest } = require('retool-cli/lib/utils/networking')
-const { getWorkflowsAndFolders } = require('retool-cli/lib/utils/workflows')
+const { getWorkflowsAndFolders, deleteWorkflow } = require('retool-cli/lib/utils/workflows')
 const chalk = require('chalk')
-
+const inquirer = require('inquirer')
 const ora = require('ora')
 
 const workflowData = require('../queries/WeavyRetoolWorkflow.json')
+
+const envUrlRegex = /(?<=^|\s|{|,)WEAVY_URL:[\s]*(?<url>[^,}]+)/gm
+const envApiKeyRegex = /(?<=^|\s|{|,)WEAVY_APIKEY:[\s]*(?<apiKey>[^,}]+)/gm
 
 async function createWorkflow(newWorkflowName, credentials) {
   const { workflows } = await getWorkflowsAndFolders(credentials)
@@ -17,9 +22,42 @@ async function createWorkflow(newWorkflowName, credentials) {
   )
 
   if (weavyWorkflow) {
-    console.log('Successfully found a workflow. 🎉')
+    const replace = await inquirer.prompt([
+      {
+        name: 'confirm',
+        message: 'Do you want to replace the existing '.concat(workflowData.name, '?'),
+        type: 'confirm',
+        default: false
+      }
+    ])
+
+    if (replace.confirm) {
+      await deleteWorkflow(workflowData.name, credentials, false)
+      weavyWorkflow = null
+    }
+  }
+
+  if (weavyWorkflow) {
+    console.log('Using the existing workflow. 🎉')
   } else {
     let spinner = ora('Creating workflow').start()
+
+    // Patch configuration
+
+    if (process.env.WEAVY_URL) {
+      // Defaulted value
+      workflowData.templateData = workflowData.templateData.replace(envUrlRegex, `WEAVY_URL: retoolContext.configVars.WEAVY_URL || \\"${process.env.WEAVY_URL}\\"`)
+    } else {
+      workflowData.templateData = workflowData.templateData.replace(envUrlRegex, `WEAVY_URL: retoolContext.configVars.WEAVY_URL`)
+    }
+
+    if (process.env.WEAVY_APIKEY) {
+      // Defaulted value
+      workflowData.templateData = workflowData.templateData.replace(envApiKeyRegex, `WEAVY_APIKEY: retoolContext.configVars.WEAVY_APIKEY || \\"${process.env.WEAVY_APIKEY}\\"`)
+    } else {
+      workflowData.templateData = workflowData.templateData.replace(envApiKeyRegex, `WEAVY_APIKEY: retoolContext.configVars.WEAVY_APIKEY`)
+    }
+
 
     // Create workflow.
     const workflow = await postRequest(

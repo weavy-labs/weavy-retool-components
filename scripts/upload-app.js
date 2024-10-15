@@ -17,8 +17,7 @@ const workflowData = require('../queries/WeavyRetoolWorkflow.json')
 const uuidRegex = /"collectionUuid","(?<uuid>[0-9a-f\-]+)"/gm
 const revUuidRegex = /"collectionRevisionUuid","(?<revUuid>[0-9a-f\-]+)"/gm
 const workflowRegex = /"workflowId","(?<workflowId>[0-9a-f\-]+)"/gm
-const envRegex =
-  /window\.WEAVY_URL = \\"(?<url>[^\"]*)\\"/gm
+const envRegex = /{{ retoolContext\.configVars\??\.WEAVY_URL[^\}]*}}/gm
 
 async function createWeavyApp(appName, credentials) {
   const { workflows } = await getWorkflowsAndFolders(credentials)
@@ -49,12 +48,18 @@ async function createWeavyApp(appName, credentials) {
     )
   }
 
+  // Patch environment variable
   if (process.env.WEAVY_URL) {
-    // Patch environment variable
+    // Defaulted value
     appState = appState.replace(
       envRegex,
-      `window.WEAVY_URL = \\"${process.env.WEAVY_URL}\\"`
+      `{{ retoolContext.configVars?.WEAVY_URL || \\"${process.env.WEAVY_URL}\\" }}`
     )
+  } else {
+    appState = appState.replace(
+        envRegex,
+        `{{ retoolContext.configVars?.WEAVY_URL }}`
+      )
   }
 
   const appsAndFolders = await getAppsAndFolders(credentials)

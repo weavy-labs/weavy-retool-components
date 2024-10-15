@@ -15,9 +15,14 @@ export const useWeavyUrl = () => {
   const [weavyUrl] = Retool.useStateString({
     name: 'weavyUrl',
     label: 'Weavy environment URL *',
-    initialValue: '{{ retoolContext.configVars?.WEAVY_URL || window.WEAVY_URL }}',
+    initialValue: '{{ WEAVY_URL.value }}',
     description: 'The url to the weavy environment'
   })
+
+  if (weavyUrl === "") {
+    throw new Error("No WEAVY_URL variable is defined in the Retool app. Make sure your app is configured with a Weavy environment url.")
+  }
+
   return { weavyUrl }
 }
 
