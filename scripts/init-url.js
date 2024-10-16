@@ -83,12 +83,12 @@ getAndVerifyCredentialsWithRetoolDB().then(async (credentials) => {
         changedJS = js.replace(
         jsRegex,
         process.env.WEAVY_URL
-          ? `window.WEAVY_URL = "${process.env.WEAVY_URL}";`
+          ? `window.WEAVY_URL = { value: "${process.env.WEAVY_URL}" };`
           : ''
       )
     }
   } else {
-    changedJS = `${js || ''}${js ? '\n' : ''}window.WEAVY_URL = "${process.env.WEAVY_URL}";`
+    changedJS = `${js || ''}${js ? '\n' : ''}window.WEAVY_URL = { value: "${process.env.WEAVY_URL}" };`
   }
 
   if (changedJS !== undefined) {
