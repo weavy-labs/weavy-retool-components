@@ -92,6 +92,6 @@ getAndVerifyCredentialsWithRetoolDB().then(async (credentials) => {
   }
 
   if (changedJS !== undefined) {
-      await saveOrgJS(js, credentials)
+      await saveOrgJS(changedJS, credentials)
   }
 })
