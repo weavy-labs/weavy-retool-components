@@ -10,51 +10,6 @@ export type OpenAppParameters = {
   }
 }
 
-// Match retool url paths starting with /app/... or /editor/...
-const pathRegex =
-  /\/(app\/[^#\?\/]+|editor\/[^\/]+\/[^#\?\/]+)\/?(?<relPath>.*)$/
-
-// Extracts pageName, search and hash from a relPath
-const relRegex =
-  /\/?(?<pageName>[^\/?#]*)([?](?<search>[^#]*))?(#(?<hash>[^#]*))?$/
-
-const extractPath = (url: string) => {
-  const result = url.match(pathRegex)
-  let relPath = ''
-
-  if (result && result?.groups?.relPath) {
-    relPath = result?.groups?.relPath
-  } else {
-    // Fallback extraction
-    const baseUrl = new URL('.', url)
-    relPath = url.split(baseUrl.pathname, 2)[1]
-  }
-
-  return { relPath }
-}
-
-export const getComponentParams = (relPath: string) => {
-  const result = relPath.match(relRegex)
-
-  if (!result || !result.groups) {
-    throw Error('Invalid relPath')
-  }
-
-  const pageName = result.groups.pageName || undefined
-
-  const searchQueryParams = new URLSearchParams(result.groups.search)
-  const hashQueryParams = new URLSearchParams(result.groups.hash)
-
-  const queryParams = Object.fromEntries(searchQueryParams.entries())
-  const hashParams = Object.fromEntries(hashQueryParams.entries())
-
-  return <OpenAppParameters>{
-    pageName,
-    queryParams,
-    hashParams
-  }
-}
-
 export const useName = () => {
   const [name] = Retool.useStateString({
     name: 'name',
@@ -95,30 +50,41 @@ export const useAppUuid = () => {
   return { appUuid }
 }
 
-export const useComponentPath = () => {
+export const useUrl = () => {
+  const [currentPage] = Retool.useStateString({
+    name: 'currentPage',
+    description: 'The currentPage of the app.',
+    initialValue: '{{ retoolContext.currentPage }}',
+    inspector: 'hidden'
+  })
   const [componentUrl] = Retool.useStateString({
-    name: 'componentPath',
-    description: 'The href of the component.',
-    initialValue: '{{ urlparams.href }}',
+    name: 'componentUrl',
+    description: 'The url params of the current page.',
+    initialValue: '{{ urlparams.href || url.href }}',
     inspector: 'hidden'
   })
 
-  let relPath = ''
-  let componentParams = {}
+  const url = new URL(componentUrl);
 
-  if (componentUrl) {
-    relPath = extractPath(componentUrl).relPath
-    componentParams = getComponentParams(relPath)
+  const pageName = currentPage || undefined
+  const queryParams = Object.fromEntries(url.searchParams.entries())
+  const hashParams = Object.fromEntries(url.hash ? new URLSearchParams(url.hash.substring(1)).entries() : [])
+
+  const componentParams = <OpenAppParameters>{
+    pageName,
+    queryParams,
+    hashParams
   }
-  return { componentPath: relPath, componentParams }
+
+  return { url: componentParams }
 }
 
 export const useEncodedUid = (initialValue?: string) => {
   const { appUuid } = useAppUuid()
-  const { componentPath } = useComponentPath()
+  const { url } = useUrl()
   const { uid } = useUid() || initialValue || ''
 
-  const encodedUid = `retool:${uid}:${appUuid}:${btoa(componentPath)}`
+  const encodedUid = `retool:${uid}:${appUuid}:${btoa(JSON.stringify(url))}`
 
   const [_encodedUid, setEncodedUid] = Retool.useStateString({
     name: 'encodedUid',
@@ -134,8 +100,8 @@ export const useEncodedUid = (initialValue?: string) => {
 
 export const decodeUid = (encodedUid: string) => {
   if (encodedUid.startsWith('retool:')) {
-    const [_prefix, uid, appUuid, encodedPath] = encodedUid.split(':', 4)
-    return { uid, appUuid, relPath: atob(encodedPath) }
+    const [_prefix, uid, appUuid, encodedUrl] = encodedUid.split(':', 4)
+    return { uid, appUuid, url: JSON.parse(atob(encodedUrl)) }
   }
-  return { uid: undefined, appUuid: undefined, relPath: undefined }
+  return { uid: undefined, appUuid: undefined, url: undefined }
 }

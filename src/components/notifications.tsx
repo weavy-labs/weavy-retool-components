@@ -18,7 +18,6 @@ import {
 import '../styles.css'
 import {
   decodeUid,
-  getComponentParams,
   useOptionalUid
 } from '../properties/uid'
 import {
@@ -166,12 +165,11 @@ export const WeavyNotifications: FC = () => {
 
       // The uid should look something like "retool:my-chat:abcde-1235:adb567a"
       // We have embedded base-64 encoded path information in the uid and to use it we need to decode it.
-      const { uid, appUuid: componentUuid, relPath } = decodeUid(appUid)
+      const { uid, appUuid: componentUuid, url } = decodeUid(appUid)
       if (uid) {
-        if (relPath) {
+        if (url) {
           setNavigateAppUuid(componentUuid)
-          const currentParams = getComponentParams(relPath)
-          setNavigateParams(currentParams)
+          setNavigateParams(url)
         } else {
           setNavigateAppUuid('')
           setNavigateParams({})
