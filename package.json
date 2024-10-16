@@ -5,10 +5,10 @@
   "scripts": {
     "login": "retool login && retool-ccl login",
     "create:demo": "npm run create:weavy && npm run init:demo-app",
-    "create:weavy": "npm run init:url && npm run init:workflow && npm run init:components",
+    "create:weavy": "npm run init:js-url && npm run init:workflow && npm run init:components",
     "create:weavy-pro": "npm run init:config-variables && npm run init:workflow && npm run init:components",
     "init:config-variables": "node scripts/init-config-variables.js",
-    "init:url": "node scripts/init-url.js",
+    "init:js-url": "node scripts/init-url.js",
     "init:workflow": "node scripts/upload-workflow.js",
     "init:components": "node scripts/init-components.js",
     "init:demo-app": "node scripts/upload-app.js",
