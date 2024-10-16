@@ -138,12 +138,10 @@ getAndVerifyCredentialsWithRetoolDB().then(async (credentials) => {
       if (replace.confirm) {
         await deleteConfigVariable(existingConfigVar, credentials)
         existingConfigVar = null
-      } else {
-        process.exit(1)
       }
     }
 
-    if (process.env.WEAVY_URL !== undefined) {
+    if (process.env.WEAVY_URL !== undefined && !existingConfigVar) {
       try {
         await createConfigVariable(
           'WEAVY_URL',
@@ -181,12 +179,11 @@ getAndVerifyCredentialsWithRetoolDB().then(async (credentials) => {
 
       if (replace.confirm) {
         await deleteConfigVariable(existingConfigVar, credentials)
-      } else {
-        process.exit(1)
+        existingConfigVar = null
       }
     }
 
-    if (process.env.WEAVY_APIKEY !== undefined) {
+    if (process.env.WEAVY_APIKEY !== undefined && !existingConfigVar) {
       try {
         await createConfigVariable(
           'WEAVY_APIKEY',
