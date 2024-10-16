@@ -69,7 +69,7 @@ getAndVerifyCredentialsWithRetoolDB().then(async (credentials) => {
 
   let changedJS
 
-  if (js.match(jsRegex)) {
+  if (js && js.match(jsRegex)) {
     const replace = await inquirer.prompt([
       {
         name: 'confirm',
@@ -88,7 +88,7 @@ getAndVerifyCredentialsWithRetoolDB().then(async (credentials) => {
       )
     }
   } else {
-    changedJS = `${js}${js ? '\n' : ''}window.WEAVY_URL = "${process.env.WEAVY_URL}";`
+    changedJS = `${js || ''}${js ? '\n' : ''}window.WEAVY_URL = "${process.env.WEAVY_URL}";`
   }
 
   if (changedJS !== undefined) {
