@@ -1,5 +1,4 @@
 import { Retool } from '@tryretool/custom-component-support'
-import { useEffect, useState } from 'react'
 
 export const useAccessToken = () => {
   const [accessToken] = Retool.useStateString({
@@ -8,6 +7,18 @@ export const useAccessToken = () => {
     initialValue: '{{ getWeavyToken.data?.access_token }}',
     description: 'The access token for the user'
   })
+  const [getWeavyTokenCheck] = Retool.useStateString({
+    name: 'getWeavyTokenCheck',
+    label: 'getWeavyToken verification',
+    initialValue: '{{ getWeavyToken.id }}',
+    description: 'Field for verifying the getWeavyToken',
+    inspector: 'hidden'
+  })
+
+  if (getWeavyTokenCheck !== "getWeavyToken") {
+    throw new Error("No getWeavyToken workflow query defined. Create an imported workflow query called getWeavyToken and link it to the WeavyRetoolWorkflow.")
+  }
+
   return { accessToken }
 }
 
