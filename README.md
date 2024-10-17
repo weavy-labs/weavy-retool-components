@@ -18,64 +18,35 @@ npm install
 
 ### Sign in to Retool
 
-To use the Retool utils for development and publishing, first sign into your Retool account.
+To use the Retool utils for development and publishing, first sign into your Retool account. You will need [admin permissions](https://docs.retool.com/org-users/concepts/permission-groups#default-permission-groups) in Retool.
+You will also need an API key. See [Retool API authentication documentation](https://docs.retool.com/org-users/guides/retool-api/authentication#create-an-access-token).
 
 ```bash
-npx retool-ccl login
-```
-
-### Init the library
-
-To be able to upload your library to Retool, you must first register the library within your Retool account.
-
-```bash
-npx retool-ccl init
-```
-
-The following properties are recommended, but you may customize it as you like.
-
-- Name: "Weavy"
-- Description: "Weavy components"
-
-### Develop
-
-Modify any components and update them in your Retool account.
-
-```bash
-npm run dev
-```
-
-### Deploy
-
-Deploy any finished components in your Retool account.
-
-```bash
-npm run deploy
+npx run login
 ```
 
 ## Weavy components
 
 ### Configure Weavy
 
-Set up two configuration variables for environment url and Api key in you [Settings > Configuration variables](https://docs.retool.com/org-users/guides/config-vars#create-configuration-variables). You may specify different environment/api key for staging and production.
+For the configuration scripts to work, you need to provide a `WEAVY_URL`and `WEAVY_APIKEY` environment variable.
+These can be defined in an `.env` file in the root of the project (see [.env.example](./.env.example)).
 
-- WEAVY_URL: *Your Environment URL*
-- WEAVY_APIKEY: *Your wys_*** API key **Note: this should be set as secret**.
+```ini
+# .env
+WEAVY_URL="https:example.weavy.io" # Your Weavy environment URL
+WEAVY_APIKEY="wys_*********" # Your secret API key.
+```
 
 ### Set up workflow and queries
 
-The queries will provide your apps and components with user tokens for Weavy.
+The queries will provide your apps and components with user tokens for Weavy authentication. You can set up everything with one command.
 
-#### Upload the `WeavyRetoolWorkFlow.json`
+```bash
+npm run create:weavy
+```
 
-- Go to *Workflows* in Retool.
-- Click **Create New** and select **From JSON**.
-- Choose to **Upload a file** and select [queries/WeavyRetoolWorkflow.json](./queries/WeavyRetoolWorkflow.json) in the modal and then **Create workflow**.
-- All settings are already included, so all you have to do is Deploy (up to the right).
-  - If the Deploy button is disabled, it's either already deployed (look for the text Latest version deployed), or some of the settings might not have loaded correctly - refresh, and it should be working.
-  - Any message about no triggers configured can be ignored.
-
-#### Use the workflow in an app query
+### Use the workflow in an app query
 
 To activate and use the workflow your Retool app, you need to add a query that is using the workflow.
 
@@ -137,12 +108,30 @@ Add the *Weavy Notifications* component to your app.
 
 To set up navigation when clicking notification items in the Notifications component, you must first [Customize app URLs](https://docs.retool.com/apps/guides/customization/customize-app-urls) in *App settings* > *Page settings* your Retool app, to be able to use deep links. This can be a bit challenging if you haven't done it before. Make sure there is a way to navigate to all the places where you are using Weavy components. Once this is done, the Weavy components will automatically encode these page variables into their own *uid*.
 
-* Add an *Event handler* for the `Navigation` event.
+* Add an *Event handler* for the `Navigate` event.
   - Set the event to **Run script**.
   - Set the script to
     ```js
-    utils.openApp(retoolContext.appUuid, weavyNotifications1.navigationParams)
+    utils.openApp(weavyNotifications1.navigateAppUuid, weavyNotifications1.navigateParams)
     ```
-* Optionally any additional *Event handler* for the `Navigation` event to do additional things upon navigation, such as closing a *Drawer* for instance.
-* Add an *Event handler for the `Open messenger` event.
- - Set the event to do whatever you need to show the messenger, such as opening a drawer.
+* Optionally any additional *Event handler* for the `Navigate` event to do additional things upon navigation, such as closing a *Drawer* for instance.
+
+## Customization
+
+You can customize the components anyway you like.
+
+### Develop
+
+Modify any components and update them in your Retool account.
+
+```bash
+npm run dev
+```
+
+### Deploy
+
+Deploy any finished components in your Retool account.
+
+```bash
+npm run deploy
+```
