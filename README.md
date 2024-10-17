@@ -32,8 +32,8 @@ These can be defined in an `.env` file in the root of the project (see [.env.exa
 
 ```ini
 # .env
-WEAVY_URL="https:example.weavy.io" # Your Weavy environment URL
-WEAVY_APIKEY="wys_*********" # Your secret API key.
+WEAVY_URL="https://example.weavy.io" # Your Weavy environment URL
+WEAVY_APIKEY="wys_*********" # Your secret API key
 ```
 
 ## Demo app
