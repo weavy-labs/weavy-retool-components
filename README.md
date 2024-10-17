@@ -25,8 +25,6 @@ You will also need an API key. See [Retool API authentication documentation](htt
 npx run login
 ```
 
-## Weavy components
-
 ### Configure Weavy
 
 For the configuration scripts to work, you need to provide a `WEAVY_URL`and `WEAVY_APIKEY` environment variable.
@@ -38,20 +36,42 @@ WEAVY_URL="https:example.weavy.io" # Your Weavy environment URL
 WEAVY_APIKEY="wys_*********" # Your secret API key.
 ```
 
-### Set up workflow and queries
+## Demo app
+
+There is a full Retool app example with integrated Weavy components. You can create the Weavy components and upload the demo app to your Retool account with the following command.
+
+```bash
+npm run create:demo
+```
+
+## Weavy components
 
 The queries will provide your apps and components with user tokens for Weavy authentication. You can set up everything with one command.
+
+> If you already have created the demo app, this is already done.
 
 ```bash
 npm run create:weavy
 ```
 
+### Using configuration variables
+
+We strongly recommend you to use [configuration variables](https://docs.retool.com/org-users/guides/config-vars) in Retool to store the Weavy configuration.
+
+You can init the components with configuration variables instead.
+
+```bash
+npm run create:weavy-pro
+```
+
+> Note: *Configuration variables* are **not** available in the Retool *Free* plan.
+
 ### Use the workflow in an app query
 
-To activate and use the workflow your Retool app, you need to add a query that is using the workflow.
+To activate and use the authentication workflow within your Retool app, you need to add a query that is using the workflow.
 
 - Open your Retool app editor and go to the **<> Code** panel.
-- Click on **＋ Add query** and choose Import Workflow.
+- Click on **＋ Add query** and choose **Import Workflow**.
 - Name the query `getWeavyToken`.
 - Select **Workflow** and choose **WeavyRetoolWorkflow**.
   
@@ -70,7 +90,7 @@ To activate and use the workflow your Retool app, you need to add a query that i
 
 ### Using weavy components
 
-Drag'n'drop components into your app. You may have to configure `uid` on any contextual components. The components follow your theme settings, but you may also override any theme settings.
+Drag'n'drop components into your app. You may have to configure `uid` and `displayName` on any contextual components. The components follow your theme settings, but you may also override any theme settings.
 
 ### Setting up notification events
 
@@ -80,8 +100,8 @@ Drag the **Weavy Notification Events** component into you app. The component mus
 
 * Add an *Event handler* for the `Notification` event. 
   - Set the event to **Show notification**.
-  - Set the Title to `{{ self.notificationTitle }}`
-  - Set the description to `{{ self.notificationTitle }}`.
+  - Set the *Title* to `{{ self.notificationTitle }}`
+  - Set the *Description* to `{{ self.notificationDescription }}`.
 
 #### Configure token refreshing
 
