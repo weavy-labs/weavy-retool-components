@@ -22,7 +22,7 @@ To use the Retool utils for development and publishing, first sign into your Ret
 You will also need an API key. See [Retool API authentication documentation](https://docs.retool.com/org-users/guides/retool-api/authentication#create-an-access-token).
 
 ```bash
-npx run login
+npm run login
 ```
 
 ### Configure Weavy
