@@ -1,22 +1,22 @@
 {
   "name": "weavy-react-components",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "login": "retool login && retool-ccl login",
     "create:demo": "npm run create:weavy && npm run init:demo-app",
-    "create:weavy": "npm run init:js-url && npm run init:workflow && npm run init:components",
-    "create:weavy-pro": "npm run init:config-variables && npm run init:workflow && npm run init:components",
+    "create:weavy": "npm run init:js-url && npm run init:workflows && npm run init:components",
+    "create:weavy-pro": "npm run init:config-variables && npm run init:workflows && npm run init:components",
     "init:config-variables": "node scripts/init-config-variables.js",
     "init:js-url": "node scripts/init-url.js",
-    "init:workflow": "node scripts/upload-workflow.js",
+    "init:workflows": "node scripts/upload-workflows.js",
     "init:components": "node scripts/init-components.js",
     "init:demo-app": "node scripts/upload-app.js",
     "dev": "retool-ccl dev",
     "deploy": "retool-ccl deploy"
   },
   "dependencies": {
-    "@weavy/uikit-react": "^24.4.1",
+    "@weavy/uikit-react": "^25.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

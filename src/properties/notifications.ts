@@ -1,4 +1,20 @@
 import { Retool } from '@tryretool/custom-component-support'
+import { AppWithPageType } from '../components/notifications'
+import { useCallback } from 'react'
+
+export type OpenAppParameters = {
+  pageName?: string
+  queryParams?: {
+    [k: string]: string
+  }
+  hashParams?: {
+    [k: string]: string
+  }
+}
+
+export type PageDataType = OpenAppParameters & {
+  appUuid?: string
+}
 
 export const useNotificationCount = () => {
   const [_notificationCount, setNotificationCount] = Retool.useStateNumber({
@@ -47,11 +63,34 @@ export const useNotificationProps = () => {
     inspector: 'select',
     initialValue: 'count'
   })
-  
+
   return {
     notifications: <'button-list' | 'none'>(
       (enableNotifications ? 'button-list' : 'none')
     ),
     notificationsBadge: <'count' | 'dot' | 'none'>notificationsBadge
   }
+}
+
+type WyAppRef = HTMLElement & { whenApp: () => Promise<AppWithPageType> } | null
+
+export const useNavigationEventCallback = (deps: React.DependencyList) => {
+  const triggerNotification = Retool.useEventCallback({
+    name: 'SetWeavyNavigation'
+  })
+
+  const navigationRefCallBack = useCallback((weavyComponent: WyAppRef) => {
+    if (weavyComponent) {
+      requestAnimationFrame(() => {
+        weavyComponent.whenApp().then((app: AppWithPageType) => {
+          if (!app.metadata?.page) {
+            //console.debug("Triggering SetWeavyNavigation", app.uid)
+            triggerNotification()
+          }
+        })
+      })
+    }
+  }, [...deps])
+
+  return { navigationRefCallBack }
 }

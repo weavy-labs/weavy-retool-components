@@ -12,20 +12,29 @@ const inquirer = require('inquirer')
 
 const weavyComponents = require('../weavy-components.json')
 const demoApp = require('../demo/weavy-components-basic-layout.json')
-const workflowData = require('../queries/WeavyRetoolWorkflow.json')
+const authenticationWorkflowData = require('../workflows/WeavyAuthentication.json')
+const pageNavigationWorkflowData = require('../workflows/WeavyPageNavigation.json')
 
 const uuidRegex = /"collectionUuid","(?<uuid>[0-9a-f\-]+)"/gm
 const revUuidRegex = /"collectionRevisionUuid","(?<revUuid>[0-9a-f\-]+)"/gm
 const workflowRegex = /"workflowId","(?<workflowId>[0-9a-f\-]+)"/gm
 const envRegex = /{{ window\.WEAVY_URL[^\}]*}}/gm
 
+const replaceAuthenticationUuid = "c89f5d62-2e6f-4043-b8b5-ff0beed070f7"
+const replacePageNavigationUuid = "f79ef59e-0d9d-41ba-b3b4-331482a1a42d"
+
 async function createWeavyApp(appName, credentials) {
   const { workflows } = await getWorkflowsAndFolders(credentials)
 
-  const weavyWorkflow = workflows.find(
-    (workflow) => workflow.name === workflowData.name
+  const weavyAuthenticationWorkflow = workflows.find(
+    (workflow) => workflow.name === authenticationWorkflowData.name
   )
-  console.log(workflowData.name, weavyWorkflow?.id)
+  console.log(authenticationWorkflowData.name, weavyAuthenticationWorkflow?.id)
+
+  const weavyPageNavigationWorkflow = workflows.find(
+    (workflow) => workflow.name === pageNavigationWorkflowData.name
+  )
+  console.log(pageNavigationWorkflowData.name, weavyPageNavigationWorkflow?.id)
 
   let appState = demoApp.page.data.appState
 
@@ -40,13 +49,26 @@ async function createWeavyApp(appName, credentials) {
     `"collectionRevisionUuid","${weavyComponents.id}"`
   )
 
-  if (weavyWorkflow) {
-    // Relink workflow uuid
-    appState = appState.replace(
-      workflowRegex,
-      `"workflowId","${weavyWorkflow.id}"`
-    )
-  }
+  // Relink workflow uuid:s
+  appState = appState.replace(workflowRegex, (match, workflowId) => {
+    if (
+      weavyAuthenticationWorkflow &&
+      workflowId === replaceAuthenticationUuid
+    ) {
+      return `"workflowId","${weavyAuthenticationWorkflow.id}"`
+    }
+
+    if (
+      weavyPageNavigationWorkflow &&
+      workflowId === replacePageNavigationUuid
+    ) {
+      return `"workflowId","${weavyPageNavigationWorkflow.id}"`
+    }
+
+    // no match
+    return `"workflowId","${workflowId}"`
+  })
+
 
   // Patch environment variable
   if (process.env.WEAVY_URL) {
@@ -64,7 +86,7 @@ async function createWeavyApp(appName, credentials) {
 
   const appsAndFolders = await getAppsAndFolders(credentials)
 
-  const existingApp = appsAndFolders.apps.find((app) => app.name === appName)
+  let existingApp = appsAndFolders.apps.find((app) => app.name === appName)
 
   if (existingApp) {
     const replace = await inquirer.prompt([

@@ -66,14 +66,14 @@ npm run create:weavy-pro
 
 > Note: *Configuration variables* are **not** available in the Retool *Free* plan.
 
-### Use the workflow in an app query
+### Use the WeavyAuthentication workflow in an app query
 
 To activate and use the authentication workflow within your Retool app, you need to add a query that is using the workflow.
 
 - Open your Retool app editor and go to the **<> Code** panel.
 - Click on **＋ Add query** and choose **Import Workflow**.
 - Name the query `getWeavyToken`.
-- Select **Workflow** and choose **WeavyRetoolWorkflow**.
+- Select **Workflow** and choose **WeavyAuthentication**.
   
   The Workflow parameters should be defaulted with the data shown below. Otherwise you can set it as *raw* data.
 
@@ -123,6 +123,51 @@ You can connect the `notificationCount` property of the *Weavy Notification Even
 ### Setting up Notifications
 
 Add the *Weavy Notifications* component to your app.
+
+#### Use the WeavyPageNavigation workflow in an app query
+
+To enable navigation when clicking Notifications, you need to provide a query for saving page metadata to use for navigation.
+
+- Open your Retool app editor and go to the **<> Code** panel.
+- Click on **＋ Add query** and choose **Import Workflow**.
+- Name the query `setWeavyNavigation`.
+- Select **Workflow** and choose **WeavyPageNavigation**.
+  
+  The Workflow parameters should be defaulted with the data shown below. Otherwise you can set it as *raw* data.
+
+  ```json
+  {
+    "uid": {{ 
+      /*
+      * uid should be set in additionalScope
+      * when triggering the query.
+      */
+      uid 
+    }},
+    "appUuid": {{ retoolContext.appUuid }},
+    "pageName": {{ retoolContext.currentPage || '' }},
+    "url": {{ urlparams.href || url.href }}
+  }
+  ```
+
+- **Save** the query!
+
+#### Trigger the setWeavyNavigation query
+
+To save page metadata for the for each contextual Weavy component (that has an uid) you need to connect the `Set weavy navigation` event to the `setWeavyNotifications` query.
+
+The trigger will usually run once for each component as long as the metadata is not already set.
+
+- Select and open the inspector for a Weavy component.
+- Add an Event handler for the `Set weavy navigation` event and set it to `Run script`.
+- Set the script to the following and replace `weavyPosts1` with the id of your component:
+  ```js
+  setWeavyNavigation.trigger({
+    additionalScope: {
+      uid: weavyPosts1.uid
+    }
+  })
+  ```
 
 #### Configure navigation
 

@@ -8,14 +8,14 @@ import {
 } from '../properties/weavy'
 
 import '../styles.css'
-import { useEncodedUid, useName } from '../properties/uid'
+import { useUid, useName } from '../properties/uid'
 import { useThemeMode, useThemeStyles } from '../properties/theme'
 import { usePostsFeatures } from '../properties/features'
-import { useNotificationProps } from '../properties/notifications'
+import { useNavigationEventCallback, useNotificationProps } from '../properties/notifications'
 
 export const WeavyPosts: FC = () => {
   const { name } = useName()
-  const { encodedUid } = useEncodedUid("posts")
+  const { uid } = useUid()
   const features = usePostsFeatures()
   const notifications = useNotificationProps()
   const { modeClassName } = useThemeMode()
@@ -23,6 +23,7 @@ export const WeavyPosts: FC = () => {
   const { weavyUrl } = useWeavyUrl()
   const { tokenFactory } = useTokenFactory()
   const { weavyOptions } = useWeavyOptions()
+  const { navigationRefCallBack } = useNavigationEventCallback([uid])
 
   const weavy = useWeavy({
     url: weavyUrl,
@@ -32,10 +33,11 @@ export const WeavyPosts: FC = () => {
 
   return (
     <WyPosts
-      uid={encodedUid}
+      uid={uid}
       name={name}
       className={modeClassName}
       style={themeStyles}
+      ref={navigationRefCallBack}
       {...notifications}
       {...features}
     />

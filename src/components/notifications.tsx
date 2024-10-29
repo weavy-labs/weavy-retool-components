@@ -4,6 +4,7 @@ import { Retool } from '@tryretool/custom-component-support'
 import {
   ConversationTypes,
   useWeavy,
+  WeavyTypes,
   WyLinkEventType,
   WyNotifications,
   WyNotificationsEventType
@@ -16,16 +17,21 @@ import {
 } from '../properties/weavy'
 
 import '../styles.css'
+import { useOptionalUid } from '../properties/uid'
 import {
-  decodeUid,
-  useOptionalUid
-} from '../properties/uid'
-import {
+  OpenAppParameters,
+  PageDataType,
   useNotificationCount,
   useNotificationDescription,
   useNotificationTitle
 } from '../properties/notifications'
 import { useThemeMode, useThemeStyles } from '../properties/theme'
+
+export type AppWithPageType = WeavyTypes.AppType & {
+  metadata?: WeavyTypes.AppType['metadata'] & {
+    page?: string
+  }
+}
 
 export const WeavyNotificationEvents: FC = () => {
   const { tokenFactory } = useTokenFactory()
@@ -139,7 +145,7 @@ export const WeavyNotifications: FC = () => {
   })
 
   const triggerNavigate = Retool.useEventCallback({ name: 'navigate' })
-  
+
   // Reserved for future use
   //const triggerLink = Retool.useEventCallback({ name: 'link' })
   //const triggerMessenger = Retool.useEventCallback({ name: 'open-messenger' })
@@ -150,7 +156,7 @@ export const WeavyNotifications: FC = () => {
     ...weavyOptions
   })
 
-  const handleLink = (e: WyLinkEventType) => {
+  const handleLink = async (e: WyLinkEventType) => {
     const appType = e.detail.app?.type
     let appUid = e.detail.app?.uid
 
@@ -160,16 +166,38 @@ export const WeavyNotifications: FC = () => {
     if (ConversationTypes.has(appType as string)) {
       // Show the messenger
       //triggerMessenger()
-    } else if (appUid) {
+    } else if (appUid && weavy) {
       // Show a contextual block by navigation to another page
 
-      // The uid should look something like "retool:my-chat:abcde-1235:adb567a"
-      // We have embedded base-64 encoded path information in the uid and to use it we need to decode it.
-      const { uid, appUuid: componentUuid, url } = decodeUid(appUid)
+      // First we much fetch the app metadata from the server
+      const response = await weavy.fetch(`/api/apps/${appUid}`)
+      if (!response.ok) {
+        console.error("Error fetching app")
+        return;
+      }
+
+      const { uid, metadata } = (await response.json()) as AppWithPageType
+
       if (uid) {
-        if (url) {
-          setNavigateAppUuid(componentUuid)
-          setNavigateParams(url)
+        if (metadata?.page) {
+          let pageData: PageDataType, pageParams: OpenAppParameters
+          try {
+            pageData = JSON.parse(metadata.page)
+            const { appUuid, hashParams, pageName, queryParams } = pageData
+
+            pageParams = {
+              pageName,
+              hashParams,
+              queryParams
+            }
+            //console.log("setting page params", appUuid, pageParams)
+
+            setNavigateAppUuid(appUuid ?? '')
+            setNavigateParams(pageParams ?? {})
+          } catch {
+            setNavigateAppUuid('')
+            setNavigateParams({})
+          }
         } else {
           setNavigateAppUuid('')
           setNavigateParams({})
