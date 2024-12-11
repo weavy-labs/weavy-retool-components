@@ -1,4 +1,4 @@
-# Weavy Retool components
+# :no_entry: [DEPRECATED] Weavy Retool components -> Active at https://github.com/weavy-labs/retool-weavy-components
 
 ## Custom component library template
 
